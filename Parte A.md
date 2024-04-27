@@ -1,13 +1,14 @@
 ---
 title: Parte A
-updated: 2024-04-27 02:22:01Z
+updated: 2024-04-27 04:27:51Z
 created: 2024-04-25 15:25:47Z
 latitude: 41.38506390
 longitude: 2.17340350
 altitude: 0.0000
 ---
 
-# Clonado del proyecto con Github
+# Reto1
+## Clonado del proyecto con Github
 
 Se puede realizar de 2 formas una directamente es desde la propia interfaz de github. Este nos permite clonar un repositorio. Como se muestra en las siguientes imágenes.
 
@@ -97,9 +98,9 @@ To https://github.com/dargamenteria/actividad1-A.git
 
 4.  En este punto tenemos el repositorio conectado y las credenciales securizadas en un repositorio, local, de claves.
 
-# Pruebas de integración con flask y wiremock
+## Pruebas de integración con flask y wiremock
 
-## Unit test con pytest
+### Unit test con pytest
 
 Primero de todo hacemos las pruebas unitarias con pytest
 
@@ -179,9 +180,10 @@ FAILED test/unit/calc_test.py::TestCalculate::test_add_method_returns_correct_re
 
 ![fbc1d1db96527ae75eea781b77afab33.png](_resources/fbc1d1db96527ae75eea781b77afab33.png)
 
-## Pruebas con flask
+### Pruebas con flask y wiremock
 
-1. Cargamos las variables de entorno
+1.  Cargamos las variables de entorno
+
 ```bash
 ubuntu@docker:~/unir/cp1a/actividad1-A$ export PYTHONPATH=$(pwd)
 ubuntu@docker:~/unir/cp1a/actividad1-A$ export FLASK_APP=$(pwd)/app/api.py
@@ -190,7 +192,9 @@ ubuntu@docker:~/unir/cp1a/actividad1-A$ echo $PYTHONPATH
 ubuntu@docker:~/unir/cp1a/actividad1-A$ echo $FLASK_APP
 /home/ubuntu/unir/cp1a/actividad1-A/app/api.py
 ```
-2. Arrancamos flask. Dado que lo ejecutamos en un servidor remoto hemos de hacer que las pruebas  se lanzen en el interfaz de red correcto
+
+2.  Arrancamos flask. Dado que lo ejecutamos en un servidor remoto hemos de hacer que las pruebas se lanzen en el interfaz de red correcto
+
 ```bash
 ubuntu@docker:~/unir/cp1a/actividad1-A$ flask run --host 0.0.0.0
  * Serving Flask app '/home/ubuntu/unir/cp1a/actividad1-A/app/api.py' (lazy loading)
@@ -204,6 +208,313 @@ ubuntu@docker:~/unir/cp1a/actividad1-A$ flask run --host 0.0.0.0
 192.168.150.250 - - [27/Apr/2024 02:16:00] "GET / HTTP/1.1" 200 -
 192.168.150.250 - - [27/Apr/2024 02:16:01] "GET /favicon.ico HTTP/1.1" 404 -
 ```
- 
 
-![ac3da47ccf48121e178a131816fec31e.png](_resources/ac3da47ccf48121e178a131816fec31e.png)
+![ac3da47ccf48121e178a131816fec31e.png](_resources/ac3da47ccf48121e178a131816fec31e.png)  
+![17df435875dcbc2fba248a66c7644ce8.png](_resources/17df435875dcbc2fba248a66c7644ce8.png)  
+![bd7e24e48cb6df18c7d36625fa98baf5.png](_resources/bd7e24e48cb6df18c7d36625fa98baf5.png)
+
+Al ejecutar las pruebas observamos que fallan al no estar implementas las funcionalidades de los test
+
+3.  Levantamos wiremock  
+    ![7cb523e5a87b86ed449808bb98d077a8.png](_resources/7cb523e5a87b86ed449808bb98d077a8.png)  
+    Realizamos las pruebas con los microservicos
+
+```bash
+ubuntu@docker:~/unir/cp1a/actividad1-A$  curl  -v http://192.168.150.227:9090/calc/sqrt/64 && echo
+*   Trying 192.168.150.227:9090...
+* Connected to 192.168.150.227 (192.168.150.227) port 9090 (#0)
+> GET /calc/sqrt/64 HTTP/1.1
+> Host: 192.168.150.227:9090
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Content-Type: text/plain
+< Access-Control-Allow-Origin: *
+< Matched-Stub-Id: ae426a77-bb26-4e35-8df4-1c1758df0bb0
+< Transfer-Encoding: chunked
+<
+* Connection #0 to host 192.168.150.227 left intact
+8
+ubuntu@docker:~/unir/cp1a/actividad1-A$ curl -vvv localhost:9090/calc/sqrt/65
+*   Trying 127.0.0.1:9090...
+* Connected to localhost (127.0.0.1) port 9090 (#0)
+> GET /calc/sqrt/65 HTTP/1.1
+> Host: localhost:9090
+> User-Agent: curl/7.81.0
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< Content-Type: text/plain;charset=UTF-8
+< Transfer-Encoding: chunked
+<
+
+                                               Request was not matched
+                                               =======================
+
+-----------------------------------------------------------------------------------------------------------------------
+| Closest stub                                             | Request                                                  |
+-----------------------------------------------------------------------------------------------------------------------
+                                                           |
+GET                                                        | GET
+/calc/sqrt/64                                              | /calc/sqrt/65                                       <<<<< URL does not match
+                                                           |
+                                                           |
+-----------------------------------------------------------------------------------------------------------------------
+* Connection #0 to host localhost left intact
+```
+
+Volvemos a ejecutar los test de los microservicios y observamos que funcionan
+
+![e3bcaeba4cb52ca69fb2f827a2bfe447.png](_resources/e3bcaeba4cb52ca69fb2f827a2bfe447.png)
+
+## Jenkins
+### Arquitectura
+Para la ejecución de las pruebas de Jenkins, utilizamos:
+* Contenedor docker de jenkins en el nodo kvm 192.168.150.227
+* Esclavos en los nodos kvm
+### Instalación
+Para la creación de los slaves utilizamos el script de terraform incluido en la carpeta iac
+
+```go
+terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of dmacvicar/libvirt from the dependency lock file
+- Finding latest version of hashicorp/null...
+- Reusing previous version of hashicorp/template from the dependency lock file
+- Using previously-installed dmacvicar/libvirt v0.7.6
+- Installing hashicorp/null v3.2.2...
+- Installed hashicorp/null v3.2.2 (signed by HashiCorp)
+- Using previously-installed hashicorp/template v2.2.0
+```
+```go
++[dani@draco ~/Documents/asignaturas/unir/devops/actividades/act1/iac ](TF:default) $ terraform apply
+data.template_file.user_data: Reading...
+data.template_file.network_config: Reading...
+data.template_file.network_config: Read complete after 0s [id=b36a1372ce4ea68b514354202c26c0365df9a17f25cd5acdeeaea525cd913edc]
+data.template_file.user_data: Read complete after 0s [id=275470003dc1462910bba6474796415d5468ae414ae3b0b70498f39bb908bca4]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # libvirt_cloudinit_disk.commoninit will be created
+  + resource "libvirt_cloudinit_disk" "commoninit" {
+      + id             = (known after apply)
+      + name           = "commoninit.iso"
+      + network_config = <<-EOT
+            version: 2
+            ethernets:
+              ens3:
+                dhcp4: true
+        EOT
+      + pool           = "pools"
+      + user_data      = <<-EOT
+            #cloud-config
+            # vim: syntax=yaml
+            # examples:
+            # https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+            bootcmd:
+              - echo "BOOT CMD"
+            runcmd:
+             - [ ls, -l, / ]
+             - [ sh, -xc, "echo $(date) ': hello world!'" ]
+            ssh_pwauth: true
+            disable_root: false
+            chpasswd:
+              list: |
+                 root:temporal
+                 ubuntu:temporal
+              expire: false
+            users:
+              - name: ubuntu
+                sudo: ALL=(ALL) NOPASSWD:ALL
+                groups: users, admin
+                home: /home/ubuntu
+                shell: /bin/bash
+                lock_passwd: false
+                ssh-authorized-keys:
+                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDj/qvzCFBoF7piKZzY7faURI4IeZowQGWhIzIkruxqmYz2CQOxjrr02dNM68ndJb/0nHv0aVApUzSsVPCjpq9FcVhysjtmKnPedDLpsQL2gCKoJJmlGAVNt/xLsV57dxma1/5Vf3oLjgKavQUG/PDho2z62/hg0U+MUoegcjG7STKVuidOWGE3mNsKIksWs1wI6y20ONO4ueO1pKWBBSZbCxK/lRo+gf6jiEVqmwxvOSv453H4ta4PN7iRpInwDQU1Dxz
++tCewPLID8d5Ewgao4a9oL04H0io8ESSSnnxyVaNbbG/pEOhN1MER81e2IS2MVXu7bodPIAPIjOMUrN8/ dani@draco
+              - name: jenkins
+                sudo: ALL=(ALL) NOPASSWD:ALL
+                groups: users, admin
+                home: /home/jenkins
+                shell: /bin/bash
+                lock_passwd: false
+                ssh-authorized-keys:
+                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDj/qvzCFBoF7piKZzY7faURI4IeZowQGWhIzIkruxqmYz2CQOxjrr02dNM68ndJb/0nHv0aVApUzSsVPCjpq9FcVhysjtmKnPedDLpsQL2gCKoJJmlGAVNt/xLsV57dxma1/5Vf3oLjgKavQUG/PDho2z62/hg0U+MUoegcjG7STKVuidOWGE3mNsKIksWs1wI6y20ONO4ueO1pKWBBSZbCxK/lRo+gf6jiEVqmwxvOSv453H4ta4PN7iRpInwDQU1Dxz
++tCewPLID8d5Ewgao4a9oL04H0io8ESSSnnxyVaNbbG/pEOhN1MER81e2IS2MVXu7bodPIAPIjOMUrN8/ dani@draco
+                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQChsNhpnJimKjQ2jjW8M591kuI3XlSHJpP1tTwzHoCqQU3twRUa2BljJOzg+2vzjsKOrKHqKNu3ycDAPPQVwO7XC8b8eyJSSVEA4b6zItYGDw11TRvJ0po3ZzHJp2wEkfrDebcQZlM1NqWM+vYorOY8g9Yx6LvX57RhvV5t8LY7vAERvoe0uq8hxtT4MhCwk2kod+iHGQSxEM9LgTpTX9EyVq+o6+Qnk5pvuUMkxThAXc+T4pvKlBniPk4yg7B9a+a7vAF
+WxxLqxWCiIX9RlwhY/Moo8u24d7y2K7AKYsP3XWfvjvzSYoHWcvDF3uweKmxXm6m+mTyAHix/+ND/IcGN9iRpKlmEMnMVTE/MVc5XA8vWwBZysxaJaxgTbwrT7YlBt2/nKiFwe9YIexR3qEjk/5//iNvYJkLsIRfwBkiOZNpJPawjV2xC4wHwyORq3xToxgRyivPV906RsO7C7fuD0C8W8Bb6JpggLz3U8oM/WfN8WkCliukfkPvpKkNCa8E= jenkins@61e68080a824
+            final_message: "The system is finally up, after $UPTIME seconds"
+        EOT
+    }
+
+  # libvirt_domain.domain-kvm["slave1"] will be created
+  + resource "libvirt_domain" "domain-kvm" {
+      + arch        = (known after apply)
+      + autostart   = (known after apply)
+      + cloudinit   = (known after apply)
+      + emulator    = (known after apply)
+      + fw_cfg_name = "opt/com.coreos/config"
+      + id          = (known after apply)
+      + machine     = (known after apply)
+      + memory      = 1024
+      + name        = "slave1"
+      + qemu_agent  = false
+      + running     = true
+      + type        = "kvm"
+      + vcpu        = 1
+
+      + console {
+          + source_host    = "127.0.0.1"
+          + source_service = "0"
+          + target_port    = "0"
+          + target_type    = "serial"
+          + type           = "pty"
+        }
+      + console {
+          + source_host    = "127.0.0.1"
+          + source_service = "0"
+          + target_port    = "1"
+          + target_type    = "virtio"
+          + type           = "pty"
+        }
+
+      + disk {
+          + scsi      = false
+          + volume_id = (known after apply)
+        }
+
+      + graphics {
+          + autoport       = true
+          + listen_address = "127.0.0.1"
+          + listen_type    = "address"
+          + type           = "spice"
+        }
+
+      + network_interface {
+          + addresses      = (known after apply)
+          + bridge         = "br0"
+          + hostname       = "kvm_docker"
+          + mac            = (known after apply)
+          + network_id     = (known after apply)
+          + network_name   = "default"
+          + wait_for_lease = true
+        }
+    }
+
+  # libvirt_domain.domain-kvm["slave2"] will be created
+  + resource "libvirt_domain" "domain-kvm" {
+      + arch        = (known after apply)
+      + autostart   = (known after apply)
+      + cloudinit   = (known after apply)
+      + emulator    = (known after apply)
+      + fw_cfg_name = "opt/com.coreos/config"
+      + id          = (known after apply)
+      + machine     = (known after apply)
+      + memory      = 1024
+      + name        = "slave2"
+      + qemu_agent  = false
+      + running     = true
+      + type        = "kvm"
+      + vcpu        = 1
+
+      + console {
+          + source_host    = "127.0.0.1"
+          + source_service = "0"
+          + target_port    = "0"
+          + target_type    = "serial"
+          + type           = "pty"
+        }
+      + console {
+          + source_host    = "127.0.0.1"
+          + source_service = "0"
+          + target_port    = "1"
+          + target_type    = "virtio"
+          + type           = "pty"
+        }
+
+      + disk {
+          + scsi      = false
+          + volume_id = (known after apply)
+        }
+
+      + graphics {
+          + autoport       = true
+          + listen_address = "127.0.0.1"
+          + listen_type    = "address"
+          + type           = "spice"
+        }
+
+      + network_interface {
+          + addresses      = (known after apply)
+          + bridge         = "br0"
+          + hostname       = "kvm_docker"
+          + mac            = (known after apply)
+          + network_id     = (known after apply)
+          + network_name   = "default"
+          + wait_for_lease = true
+        }
+    }
+
+  # libvirt_volume.kvm_docker_vol["slave1"] will be created
+  + resource "libvirt_volume" "kvm_docker_vol" {
+      + format = "qcow2"
+      + id     = (known after apply)
+      + name   = "kvm_slave1-qcow2"
+      + pool   = "pools"
+      + size   = (known after apply)
+      + source = "/files/vrt/libvirt/pools/ubuntu-22.04-server-cloudimg-amd64.img"
+    }
+
+  # libvirt_volume.kvm_docker_vol["slave2"] will be created
+  + resource "libvirt_volume" "kvm_docker_vol" {
+      + format = "qcow2"
+      + id     = (known after apply)
+      + name   = "kvm_slave2-qcow2"
+      + pool   = "pools"
+      + size   = (known after apply)
+      + source = "/files/vrt/libvirt/pools/ubuntu-22.04-server-cloudimg-amd64.img"
+    }
+
+  # null_resource.provisioner["slave1"] will be created
+  + resource "null_resource" "provisioner" {
+      + id = (known after apply)
+    }
+
+  # null_resource.provisioner["slave2"] will be created
+  + resource "null_resource" "provisioner" {
+      + id = (known after apply)
+    }
+
+Plan: 7 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+...
+...
+
+null_resource.provisioner["slave1"] (remote-exec): No VM guests are running outdated
+null_resource.provisioner["slave1"] (remote-exec):  hypervisor (qemu) binaries on this
+null_resource.provisioner["slave1"] (remote-exec):  host.
+null_resource.provisioner["slave1"]: Creation complete after 1m43s [id=3813400819019273591]
+
+Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
++[dani@draco ~/Documents/asignaturas/unir/devops/actividades/act1/iac ](TF:default) $ 
+```
+
+![e752edca3d4c1f4060e37203c89a2d85.png](_resources/e752edca3d4c1f4060e37203c89a2d85.png)
+
+### Prueba 1
+### Prueba 2
+### Prueba 3
