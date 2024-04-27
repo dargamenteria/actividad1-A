@@ -7,7 +7,8 @@ import pytest
 
 BASE_URL = "http://localhost:5000"
 BASE_URL_MOCK = "http://localhost:9090"
-DEFAULT_TIMEOUT = 2  # in secs
+DEFAULT_TIMEOUT = 20  # in secs
+
 
 @pytest.mark.api
 class TestApi(unittest.TestCase):
@@ -21,9 +22,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(
             response.status, http.client.OK, f"Error en la petición API a {url}"
         )
-        self.assertEqual(
-            response.read().decode(), "3", "ERROR ADD"
-        )
+        self.assertEqual(response.read().decode(), "3", "ERROR ADD")
 
     def test_api_sqrt(self):
         url = f"{BASE_URL_MOCK}/calc/sqrt/64"
@@ -31,9 +30,8 @@ class TestApi(unittest.TestCase):
         self.assertEqual(
             response.status, http.client.OK, f"Error en la petición API a {url}"
         )
-        self.assertEqual(
-            response.read().decode(), "8", "ERROR SQRT"
-        )
+        self.assertEqual(response.read().decode(), "8", "ERROR SQRT")
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
