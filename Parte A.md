@@ -1,13 +1,15 @@
 ---
 title: Parte A
-updated: 2024-04-27 04:27:51Z
+updated: 2024-04-27 18:06:57Z
 created: 2024-04-25 15:25:47Z
 latitude: 41.38506390
 longitude: 2.17340350
 altitude: 0.0000
 ---
 
+[toc]
 # Reto1
+
 ## Clonado del proyecto con Github
 
 Se puede realizar de 2 formas una directamente es desde la propia interfaz de github. Este nos permite clonar un repositorio. Como se muestra en las siguientes imágenes.
@@ -271,11 +273,18 @@ Volvemos a ejecutar los test de los microservicios y observamos que funcionan
 ![e3bcaeba4cb52ca69fb2f827a2bfe447.png](_resources/e3bcaeba4cb52ca69fb2f827a2bfe447.png)
 
 ## Jenkins
+
 ### Arquitectura
+
 Para la ejecución de las pruebas de Jenkins, utilizamos:
-* Contenedor docker de jenkins en el nodo kvm 192.168.150.227
-* Esclavos en los nodos kvm
+
+- Contenedor docker de jenkins en el nodo kvm 192.168.150.227
+- Esclavos en los nodos kvm
+    - slave1: 192.168.150.205
+    - slave2: 192.168.150.229
+
 ### Instalación
+
 Para la creación de los slaves utilizamos el script de terraform incluido en la carpeta iac
 
 ```go
@@ -292,6 +301,7 @@ Initializing provider plugins...
 - Installed hashicorp/null v3.2.2 (signed by HashiCorp)
 - Using previously-installed hashicorp/template v2.2.0
 ```
+
 ```go
 +[dani@draco ~/Documents/asignaturas/unir/devops/actividades/act1/iac ](TF:default) $ terraform apply
 data.template_file.user_data: Reading...
@@ -515,6 +525,73 @@ Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 
 ![e752edca3d4c1f4060e37203c89a2d85.png](_resources/e752edca3d4c1f4060e37203c89a2d85.png)
 
+#### Pruebas de conectividad
+
+Se realizan pruebas de conectividad entre:
+
+- Los slaves y el docker de jenkins  
+    ![187949c40755a2befed0c50923d18ed9.png](_resources/187949c40755a2befed0c50923d18ed9.png)
+- Entre los nodos slave  
+    ![d2145d4615ecbb401ab73e37486fc3c5.png](_resources/d2145d4615ecbb401ab73e37486fc3c5.png)  
+    ![8cfbbb548663e9aaa8aecc64f19a4700.png](_resources/8cfbbb548663e9aaa8aecc64f19a4700.png)
+
 ### Prueba 1
+
+####Crear y ejecutar un pipeline simple, una sola etapa con un “echo”  
+Se crea una sencilla pipeline con el script que se muestra abajo
+
+1.  Se crea la pipeline Jenkins1_1
+2.  Se crea el script de la pipeline
+3.  Resultados de la ejecución
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}
+```
+
+![33dc29cf22951e73ec40afe0b640fd93.png](_resources/33dc29cf22951e73ec40afe0b640fd93.png)  
+![3dc5574316a98069a4c78d65c69a99f1.png](_resources/3dc5574316a98069a4c78d65c69a99f1.png)
+
+#### Añadir un comando git para traer todo el código fuente del repositorio
+Para conectarse al repositorio de git es necesario la utilización de un token. Almacenamos el valor del token en una credencial de tipo secret en Jenkins
+![2b3538437ff4d8191a3fdffb1cfb9542.png](_resources/2b3538437ff4d8191a3fdffb1cfb9542.png)
+
+Como en el caso anterior creamos el pipeline y el script que se muestra abajo
+```groovy
+pipeline {
+    agent any
+    environment {
+        GIT_TOKEN=credentials ('dargamenteria_github_token')
+    }
+    stages {
+        stage('get code from repo') {
+            steps {
+               sh ('git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A')
+            }
+        }
+    }
+}
+```
+
+La salida de la pipeline se muetra a continuación.
+ ![47822eb917d13f2cfb842cb2c9d45f7f.png](_resources/47822eb917d13f2cfb842cb2c9d45f7f.png)
+    
+#### Verificar que el código se ha descargado mediante comando dir (o ls –la)
+    
+- Verificar cuál es el espacio de trabajo (echo %WORKSPACE% o echo $WORKSPACE)
+    
+- Añadir etapa “Build” (que no hace nada realmente)
+    
+
 ### Prueba 2
+
 ### Prueba 3
