@@ -656,28 +656,6 @@ pipeline {
 
 Se realizar un procedimiento analogo al punto anterior.
 
-``` groovy
-pipeline {
-    agent any
-    environment {
-        GIT_TOKEN=credentials ('dargamenteria_github_token')
-    }
-    stages {
-        stage('get code from repo') {
-            steps {
-               sh ('''
-                    git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
-                    ls -arlt 
-                    echo $WORKSPACE
-                '''
-               )
-               
-            }
-        }
-    }
-}
-```
-
 ![d63b5d6d9c41716f480a55676bf28a02.png](_resources/d63b5d6d9c41716f480a55676bf28a02.png)
 \#### Añadir etapa "Build" (que no hace nada realmente) Realizamos el
 mismo proceso que en los puntos anteriores. Hemos tenido que limpiar el
