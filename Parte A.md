@@ -1,18 +1,53 @@
+-   [Reto1](#reto1)
+    -   [Clonado del proyecto con
+        Github](#clonado-del-proyecto-con-github)
+    -   [Securización local del repositorio
+        git](#securización-local-del-repositorio-git)
+    -   [Pruebas de integración con flask y
+        wiremock](#pruebas-de-integración-con-flask-y-wiremock)
+        -   [Unit test con
+            pytest](#unit-test-con-pytest)
+        -   [Pruebas con flask y
+            wiremock](#pruebas-con-flask-y-wiremock)
+    -   [Jenkins](#jenkins)
+        -   [Arquitectura](#arquitectura)
+        -   [Instalación](#instalación)
+            -   [Pruebas de
+                conectividad](#pruebas-de-conectividad)
+        -   [Prueba 1](#prueba-1)
+            -   [Crear y ejecutar un pipeline simple, una sola etapa con
+                un
+                "echo"](#crear-y-ejecutar-un-pipeline-simple-una-sola-etapa-con-un-echo)
+            -   [Añadir un comando git para traer todo el código fuente
+                del
+                repositorio](#añadir-un-comando-git-para-traer-todo-el-código-fuente-del-repositorio)
+            -   [Verificar que el código se ha descargado mediante
+                comando dir (o ls
+                --la)](#verificar-que-el-código-se-ha-descargado-mediante-comando-dir-o-ls-la)
+            -   [Verificar cuál es el espacio de trabajo (echo
+                %WORKSPACE% o echo
+                \$WORKSPACE)](#verificar-cuál-es-el-espacio-de-trabajo-echo-workspace-o-echo-workspace)
+            -   [Añadir etapa "Build" (que no hace nada
+                realmente)](#añadir-etapa-build-que-no-hace-nada-realmente)
+        -   [Prueba 2](#prueba-2)
+        -   [Prueba 3](#prueba-3)
 
 # Reto1
 
 ## Clonado del proyecto con Github
 
-Se puede realizar de 2 formas una directamente es desde la propia interfaz de github. Este nos permite clonar un repositorio. Como se muestra en las siguientes imágenes.
+Se puede realizar de 2 formas una directamente es desde la propia
+interfaz de github. Este nos permite clonar un repositorio. Como se
+muestra en las siguientes imágenes.
 
-![c05e5142b82599250a9de7f208d183c0.png](_resources/c05e5142b82599250a9de7f208d183c0.png)  
+![c05e5142b82599250a9de7f208d183c0.png](_resources/c05e5142b82599250a9de7f208d183c0.png)\
 ![97396fad71ba47fe81b6ba4e128c364c.png](_resources/97396fad71ba47fe81b6ba4e128c364c.png)
 
 También se puede realizar via shell
 
 1.  Se clona el repositorio objetivo
 
-```bash
+``` bash
 $ git clone https://github.com/anieto-unir/helloworld.git
 Cloning into 'helloworld'...
 remote: Enumerating objects: 365, done.
@@ -25,25 +60,28 @@ Resolving deltas: 100% (163/163), done
 
 2.  Se listan los remote
 
-```bash
+``` bash
 $ git remote -v
-origin	https://github.com/anieto-unir/helloworld.git (fetch)
-origin	https://github.com/anieto-unir/helloworld.git (push)
+origin  https://github.com/anieto-unir/helloworld.git (fetch)
+origin  https://github.com/anieto-unir/helloworld.git (push)
 ```
 
 3.  Los eliminamos y añadimos los del repositorio objetivo
 
+```{=html}
+<!-- -->
 ```
-$ git remote  remove origin
-$ git remote -v
-
-```
+    $ git remote  remove origin
+    $ git remote -v
 
 ## Securización local del repositorio git
 
-1.  Para que no ande preguntando por las credenciales usamos [pass](https://www.passwordstore.org/) para almacenarlas utilizando [pass-git-helper](https://github.com/languitar/pass-git-helper) para la integración
+1.  Para que no ande preguntando por las credenciales usamos
+    [pass](https://www.passwordstore.org/) para almacenarlas utilizando
+    [pass-git-helper](https://github.com/languitar/pass-git-helper) para
+    la integración
 
-```bash
+``` bash
 File: /home/dani/.gitconfig
 [user]
     name = dargamenteria
@@ -56,11 +94,11 @@ File: /home/dani/.gitconfig
 
 2.  Añadimos el nuevo origen el token lo sacamos directamente de pass
 
-```bash
+``` bash
 $ git remote add origin  https://github.com/dargamenteria/actividad1-A.git
 $ git remote -v
-origin	https://github.com/dargamenteria/actividad1-A.git (fetch)
-origin	https://github.com/dargamenteria/actividad1-A.git (push)
+origin  https://github.com/dargamenteria/actividad1-A.git (fetch)
+origin  https://github.com/dargamenteria/actividad1-A.git (push)
 
 $ pass
 Password Store
@@ -70,13 +108,12 @@ Password Store
 │   ├── dargamenteria
 │   │   └── actividad1-A.git.gpg
 │   └── token.gpg
-
 ```
 
-3.  Subimos los cambio  
+3.  Subimos los cambio\
     ![c82d8e46c034b1964c8265e108d5bcab.png](_resources/c82d8e46c034b1964c8265e108d5bcab.png)
 
-```bash
+``` bash
 git push origin master
 Enumerating objects: 8, done.
 Counting objects: 100% (8/8), done.
@@ -89,7 +126,8 @@ To https://github.com/dargamenteria/actividad1-A.git
    935b003..0a464b8  master -> master
 ```
 
-4.  En este punto tenemos el repositorio conectado y las credenciales securizadas en un repositorio, local, de claves.
+4.  En este punto tenemos el repositorio conectado y las credenciales
+    securizadas en un repositorio, local, de claves.
 
 ## Pruebas de integración con flask y wiremock
 
@@ -99,13 +137,13 @@ Primero de todo hacemos las pruebas unitarias con pytest
 
 1.  Cargamos las variables de entorno
 
-```bash
+``` bash
 ubuntu@docker:~/unir/cp1a/actividad1-A$ export PYTHONPATH=.
 ```
 
 2.  Ejecutamos las pruebas unitarias
 
-```bash
+``` bash
 ubuntu@docker:~/unir/cp1a/actividad1-A$ pytest-3 $(pwd)/test/unit
 ===================================================================== test session starts =====================================================================
 platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0
@@ -118,9 +156,10 @@ test/unit/util_test.py ..                                                       
 ===================================================================== 11 passed in 0.03s ======================================================================
 ```
 
-3.Forzamos un error para verificar el correcto funcionamiento de las pruebas
+3.Forzamos un error para verificar el correcto funcionamiento de las
+pruebas
 
-```python
+``` python
 ubuntu@docker:~/unir/cp1a/actividad1-A$ grep -C3 5 test/unit/calc_test.py
         self.calc = Calculator()
 
@@ -177,7 +216,7 @@ FAILED test/unit/calc_test.py::TestCalculate::test_add_method_returns_correct_re
 
 1.  Cargamos las variables de entorno
 
-```bash
+``` bash
 ubuntu@docker:~/unir/cp1a/actividad1-A$ export PYTHONPATH=$(pwd)
 ubuntu@docker:~/unir/cp1a/actividad1-A$ export FLASK_APP=$(pwd)/app/api.py
 ubuntu@docker:~/unir/cp1a/actividad1-A$ echo $PYTHONPATH
@@ -186,9 +225,10 @@ ubuntu@docker:~/unir/cp1a/actividad1-A$ echo $FLASK_APP
 /home/ubuntu/unir/cp1a/actividad1-A/app/api.py
 ```
 
-2.  Arrancamos flask. Dado que lo ejecutamos en un servidor remoto hemos de hacer que las pruebas se lanzen en el interfaz de red correcto
+2.  Arrancamos flask. Dado que lo ejecutamos en un servidor remoto hemos
+    de hacer que las pruebas se lanzen en el interfaz de red correcto
 
-```bash
+``` bash
 ubuntu@docker:~/unir/cp1a/actividad1-A$ flask run --host 0.0.0.0
  * Serving Flask app '/home/ubuntu/unir/cp1a/actividad1-A/app/api.py' (lazy loading)
  * Environment: production
@@ -202,17 +242,18 @@ ubuntu@docker:~/unir/cp1a/actividad1-A$ flask run --host 0.0.0.0
 192.168.150.250 - - [27/Apr/2024 02:16:01] "GET /favicon.ico HTTP/1.1" 404 -
 ```
 
-![ac3da47ccf48121e178a131816fec31e.png](_resources/ac3da47ccf48121e178a131816fec31e.png)  
-![17df435875dcbc2fba248a66c7644ce8.png](_resources/17df435875dcbc2fba248a66c7644ce8.png)  
+![ac3da47ccf48121e178a131816fec31e.png](_resources/ac3da47ccf48121e178a131816fec31e.png)\
+![17df435875dcbc2fba248a66c7644ce8.png](_resources/17df435875dcbc2fba248a66c7644ce8.png)\
 ![bd7e24e48cb6df18c7d36625fa98baf5.png](_resources/bd7e24e48cb6df18c7d36625fa98baf5.png)
 
-Al ejecutar las pruebas observamos que fallan al no estar implementas las funcionalidades de los test
+Al ejecutar las pruebas observamos que fallan al no estar implementas
+las funcionalidades de los test
 
-3.  Levantamos wiremock  
-    ![7cb523e5a87b86ed449808bb98d077a8.png](_resources/7cb523e5a87b86ed449808bb98d077a8.png)  
+3.  Levantamos wiremock\
+    ![7cb523e5a87b86ed449808bb98d077a8.png](_resources/7cb523e5a87b86ed449808bb98d077a8.png)\
     Realizamos las pruebas con los microservicos
 
-```bash
+``` bash
 ubuntu@docker:~/unir/cp1a/actividad1-A$  curl  -v http://192.168.150.227:9090/calc/sqrt/64 && echo
 *   Trying 192.168.150.227:9090...
 * Connected to 192.168.150.227 (192.168.150.227) port 9090 (#0)
@@ -259,7 +300,8 @@ GET                                                        | GET
 * Connection #0 to host localhost left intact
 ```
 
-Volvemos a ejecutar los test de los microservicios y observamos que funcionan
+Volvemos a ejecutar los test de los microservicios y observamos que
+funcionan
 
 ![e3bcaeba4cb52ca69fb2f827a2bfe447.png](_resources/e3bcaeba4cb52ca69fb2f827a2bfe447.png)
 
@@ -269,16 +311,17 @@ Volvemos a ejecutar los test de los microservicios y observamos que funcionan
 
 Para la ejecución de las pruebas de Jenkins, utilizamos:
 
-- Contenedor docker de jenkins en el nodo kvm 192.168.150.227
-- Esclavos en los nodos kvm
-    - slave1: 192.168.150.205
-    - slave2: 192.168.150.229
+-   Contenedor docker de jenkins en el nodo kvm 192.168.150.227
+-   Esclavos en los nodos kvm
+    -   slave1: 192.168.150.205
+    -   slave2: 192.168.150.229
 
 ### Instalación
 
-Para la creación de los slaves utilizamos el script de terraform incluido en la carpeta iac
+Para la creación de los slaves utilizamos el script de terraform
+incluido en la carpeta iac
 
-```go
+``` go
 terraform init
 
 Initializing the backend...
@@ -293,7 +336,7 @@ Initializing provider plugins...
 - Using previously-installed hashicorp/template v2.2.0
 ```
 
-```go
+``` go
 +[dani@draco ~/Documents/asignaturas/unir/devops/actividades/act1/iac ](TF:default) $ terraform apply
 data.template_file.user_data: Reading...
 data.template_file.network_config: Reading...
@@ -520,22 +563,23 @@ Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 
 Se realizan pruebas de conectividad entre:
 
-- Los slaves y el docker de jenkins  
+-   Los slaves y el docker de jenkins\
     ![187949c40755a2befed0c50923d18ed9.png](_resources/187949c40755a2befed0c50923d18ed9.png)
-- Entre los nodos slave  
-    ![d2145d4615ecbb401ab73e37486fc3c5.png](_resources/d2145d4615ecbb401ab73e37486fc3c5.png)  
+-   Entre los nodos slave\
+    ![d2145d4615ecbb401ab73e37486fc3c5.png](_resources/d2145d4615ecbb401ab73e37486fc3c5.png)\
     ![8cfbbb548663e9aaa8aecc64f19a4700.png](_resources/8cfbbb548663e9aaa8aecc64f19a4700.png)
 
 ### Prueba 1
 
-#### Crear y ejecutar un pipeline simple, una sola etapa con un “echo”  
+#### Crear y ejecutar un pipeline simple, una sola etapa con un "echo"
+
 Se crea una sencilla pipeline con el script que se muestra abajo
 
 1.  Se crea la pipeline Jenkins1_1
 2.  Se crea el script de la pipeline
 3.  Resultados de la ejecución
 
-```groovy
+``` groovy
 pipeline {
     agent any
 
@@ -549,15 +593,20 @@ pipeline {
 }
 ```
 
-![33dc29cf22951e73ec40afe0b640fd93.png](_resources/33dc29cf22951e73ec40afe0b640fd93.png)  
+![33dc29cf22951e73ec40afe0b640fd93.png](_resources/33dc29cf22951e73ec40afe0b640fd93.png)\
 ![3dc5574316a98069a4c78d65c69a99f1.png](_resources/3dc5574316a98069a4c78d65c69a99f1.png)
 
 #### Añadir un comando git para traer todo el código fuente del repositorio
-Para conectarse al repositorio de git es necesario la utilización de un token. Almacenamos el valor del token en una credencial de tipo secret en Jenkins
+
+Para conectarse al repositorio de git es necesario la utilización de un
+token. Almacenamos el valor del token en una credencial de tipo secret
+en Jenkins
 ![2b3538437ff4d8191a3fdffb1cfb9542.png](_resources/2b3538437ff4d8191a3fdffb1cfb9542.png)
 
-Como en el caso anterior creamos el pipeline y el script que se muestra abajo
-```groovy
+Como en el caso anterior creamos el pipeline y el script que se muestra
+abajo
+
+``` groovy
 pipeline {
     agent any
     environment {
@@ -574,12 +623,15 @@ pipeline {
 ```
 
 La salida de la pipeline se muetra a continuación.
- ![47822eb917d13f2cfb842cb2c9d45f7f.png](_resources/47822eb917d13f2cfb842cb2c9d45f7f.png)
-    
-#### Verificar que el código se ha descargado mediante comando dir (o ls –la)
-Se copia utiliza la opción de copiar elementos de Jenkins para realizar una copia de la pipeline anterior y añadir el codigo para listar el directorio y verificar la existencia del repositorio.
+![47822eb917d13f2cfb842cb2c9d45f7f.png](_resources/47822eb917d13f2cfb842cb2c9d45f7f.png)
 
-```groovy
+#### Verificar que el código se ha descargado mediante comando dir (o ls --la)
+
+Se copia utiliza la opción de copiar elementos de Jenkins para realizar
+una copia de la pipeline anterior y añadir el codigo para listar el
+directorio y verificar la existencia del repositorio.
+
+``` groovy
 pipeline {
     agent any
     environment {
@@ -601,12 +653,12 @@ pipeline {
 ```
 
 ![58f5c70212104216feb0ebb05f6083ab.png](_resources/58f5c70212104216feb0ebb05f6083ab.png)
-    
-#### Verificar cuál es el espacio de trabajo (echo %WORKSPACE% o echo $WORKSPACE)
-Se realizar un procedimiento analogo al punto anterior. 
 
+#### Verificar cuál es el espacio de trabajo (echo %WORKSPACE% o echo \$WORKSPACE)
 
-```groovy
+Se realizar un procedimiento analogo al punto anterior.
+
+``` groovy
 pipeline {
     agent any
     environment {
@@ -628,20 +680,21 @@ pipeline {
 }
 ```
 
-
 ![d63b5d6d9c41716f480a55676bf28a02.png](_resources/d63b5d6d9c41716f480a55676bf28a02.png)
 
+#### Añadir etapa "Build" (que no hace nada realmente)
 
-#### Añadir etapa “Build” (que no hace nada realmente)
-
-Realizamos el mismo proceso que en los puntos anteriores. Hemos tenido que limpiar el workspace para evitar un error de clonado de git ya que se había descargado previamente el repositorio.
+Realizamos el mismo proceso que en los puntos anteriores. Hemos tenido
+que limpiar el workspace para evitar un error de clonado de git ya que
+se había descargado previamente el repositorio.
 
 ![ddad5926ec2308ed7547c393e97a6a6f.png](_resources/ddad5926ec2308ed7547c393e97a6a6f.png)
 ![fbfb2876e4d18231097a6a84aeb1a6ab.png](_resources/fbfb2876e4d18231097a6a84aeb1a6ab.png)
 
-También se puede añadir el borrado en la pipeline como se muestra a continuación:
+También se puede añadir el borrado en la pipeline como se muestra a
+continuación:
 
-```groovy
+``` groovy
 pipeline {
     agent any
     environment {
@@ -669,7 +722,6 @@ pipeline {
     }
 }
 ```
-
 
 ### Prueba 2
 
