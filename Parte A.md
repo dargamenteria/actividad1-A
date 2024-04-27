@@ -24,8 +24,8 @@ Se puede realizar de 2 formas una directamente es desde la propia
 interfaz de github. Este nos permite clonar un repositorio. Como se
 muestra en las siguientes imágenes.
 
-![c05e5142b82599250a9de7f208d183c0.png](_resources/c05e5142b82599250a9de7f208d183c0-1.png)\
-![97396fad71ba47fe81b6ba4e128c364c.png](_resources/97396fad71ba47fe81b6ba4e128c364c-1.png)
+![c05e5142b82599250a9de7f208d183c0.png](_resources/c05e5142b82599250a9de7f208d183c0.png)\
+![97396fad71ba47fe81b6ba4e128c364c.png](_resources/97396fad71ba47fe81b6ba4e128c364c.png)
 
 También se puede realizar via shell
 
@@ -95,7 +95,7 @@ Password Store
 ```
 
 3.  Subimos los cambio\
-    ![c82d8e46c034b1964c8265e108d5bcab.png](_resources/c82d8e46c034b1964c8265e108d5bcab-1.png)
+    ![c82d8e46c034b1964c8265e108d5bcab.png](_resources/c82d8e46c034b1964c8265e108d5bcab.png)
 
 ``` bash
 git push origin master
@@ -194,7 +194,7 @@ FAILED test/unit/calc_test.py::TestCalculate::test_add_method_returns_correct_re
 
 4.  Revertimos el cambio
 
-![fbc1d1db96527ae75eea781b77afab33.png](_resources/fbc1d1db96527ae75eea781b77afab33-1.png)
+![fbc1d1db96527ae75eea781b77afab33.png](_resources/fbc1d1db96527ae75eea781b77afab33.png)
 
 ### Pruebas con flask y wiremock
 
@@ -226,15 +226,15 @@ ubuntu@docker:~/unir/cp1a/actividad1-A$ flask run --host 0.0.0.0
 192.168.150.250 - - [27/Apr/2024 02:16:01] "GET /favicon.ico HTTP/1.1" 404 -
 ```
 
-![ac3da47ccf48121e178a131816fec31e.png](_resources/ac3da47ccf48121e178a131816fec31e-1.png)\
-![17df435875dcbc2fba248a66c7644ce8.png](_resources/17df435875dcbc2fba248a66c7644ce8-1.png)\
-![bd7e24e48cb6df18c7d36625fa98baf5.png](_resources/bd7e24e48cb6df18c7d36625fa98baf5-1.png)
+![ac3da47ccf48121e178a131816fec31e.png](_resources/ac3da47ccf48121e178a131816fec31e.png)\
+![17df435875dcbc2fba248a66c7644ce8.png](_resources/17df435875dcbc2fba248a66c7644ce8.png)\
+![bd7e24e48cb6df18c7d36625fa98baf5.png](_resources/bd7e24e48cb6df18c7d36625fa98baf5.png)
 
 Al ejecutar las pruebas observamos que fallan al no estar implementas
 las funcionalidades de los test
 
 3.  Levantamos wiremock\
-    ![7cb523e5a87b86ed449808bb98d077a8.png](_resources/7cb523e5a87b86ed449808bb98d077a8-1.png)\
+    ![7cb523e5a87b86ed449808bb98d077a8.png](_resources/7cb523e5a87b86ed449808bb98d077a8.png)\
     Realizamos las pruebas con los microservicos
 
 ``` bash
@@ -287,7 +287,7 @@ GET                                                        | GET
 Volvemos a ejecutar los test de los microservicios y observamos que
 funcionan
 
-![e3bcaeba4cb52ca69fb2f827a2bfe447.png](_resources/e3bcaeba4cb52ca69fb2f827a2bfe447-1.png)
+![e3bcaeba4cb52ca69fb2f827a2bfe447.png](_resources/e3bcaeba4cb52ca69fb2f827a2bfe447.png)
 
 ## Jenkins
 
@@ -541,17 +541,17 @@ Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 +[dani@draco ~/Documents/asignaturas/unir/devops/actividades/act1/iac ](TF:default) $ 
 ```
 
-![e752edca3d4c1f4060e37203c89a2d85.png](_resources/e752edca3d4c1f4060e37203c89a2d85-1.png)
+![e752edca3d4c1f4060e37203c89a2d85.png](_resources/e752edca3d4c1f4060e37203c89a2d85.png)
 
 #### Pruebas de conectividad
 
 Se realizan pruebas de conectividad entre:
 
 -   Los slaves y el docker de jenkins\
-    ![187949c40755a2befed0c50923d18ed9.png](_resources/187949c40755a2befed0c50923d18ed9-1.png)
+    ![187949c40755a2befed0c50923d18ed9.png](_resources/187949c40755a2befed0c50923d18ed9.png)
 -   Entre los nodos slave\
-    ![d2145d4615ecbb401ab73e37486fc3c5.png](_resources/d2145d4615ecbb401ab73e37486fc3c5-1.png)\
-    ![8cfbbb548663e9aaa8aecc64f19a4700.png](_resources/8cfbbb548663e9aaa8aecc64f19a4700-1.png)
+    ![d2145d4615ecbb401ab73e37486fc3c5.png](_resources/d2145d4615ecbb401ab73e37486fc3c5.png)\
+    ![8cfbbb548663e9aaa8aecc64f19a4700.png](_resources/8cfbbb548663e9aaa8aecc64f19a4700.png)
 
 ### Prueba 1
 
@@ -576,15 +576,15 @@ pipeline {
 }
 ```
 
-![33dc29cf22951e73ec40afe0b640fd93.png](_resources/33dc29cf22951e73ec40afe0b640fd93-1.png)\
-![3dc5574316a98069a4c78d65c69a99f1.png](_resources/3dc5574316a98069a4c78d65c69a99f1-1.png)
+![33dc29cf22951e73ec40afe0b640fd93.png](_resources/33dc29cf22951e73ec40afe0b640fd93.png)\
+![3dc5574316a98069a4c78d65c69a99f1.png](_resources/3dc5574316a98069a4c78d65c69a99f1.png)
 
 #### Añadir un comando git para traer todo el código fuente del repositorio
 
 Para conectarse al repositorio de git es necesario la utilización de un
 token. Almacenamos el valor del token en una credencial de tipo secret
 en Jenkins
-![2b3538437ff4d8191a3fdffb1cfb9542.png](_resources/2b3538437ff4d8191a3fdffb1cfb9542-1.png)
+![2b3538437ff4d8191a3fdffb1cfb9542.png](_resources/2b3538437ff4d8191a3fdffb1cfb9542.png)
 
 Como en el caso anterior creamos el pipeline y el script que se muestra
 abajo
@@ -606,7 +606,7 @@ pipeline {
 ```
 
 La salida de la pipeline se muetra a continuación.
-![47822eb917d13f2cfb842cb2c9d45f7f.png](_resources/47822eb917d13f2cfb842cb2c9d45f7f-1.png)
+![47822eb917d13f2cfb842cb2c9d45f7f.png](_resources/47822eb917d13f2cfb842cb2c9d45f7f.png)
 
 #### Verificar que el código se ha descargado mediante comando dir (o ls --la)
 
