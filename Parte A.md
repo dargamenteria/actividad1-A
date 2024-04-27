@@ -605,6 +605,7 @@ pipeline {
 #### Verificar cuál es el espacio de trabajo (echo %WORKSPACE% o echo $WORKSPACE)
 Se realizar un procedimiento analogo al punto anterior. 
 
+
 ```groovy
 pipeline {
     agent any
@@ -627,9 +628,12 @@ pipeline {
 }
 ```
 
+
 ![d63b5d6d9c41716f480a55676bf28a02.png](_resources/d63b5d6d9c41716f480a55676bf28a02.png)
 
+
 #### Añadir etapa “Build” (que no hace nada realmente)
+
 Realizamos el mismo proceso que en los puntos anteriores. Hemos tenido que limpiar el workspace para evitar un error de clonado de git ya que se había descargado previamente el repositorio.
 
 ![ddad5926ec2308ed7547c393e97a6a6f.png](_resources/ddad5926ec2308ed7547c393e97a6a6f.png)
