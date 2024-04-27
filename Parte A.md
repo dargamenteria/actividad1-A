@@ -25,19 +25,8 @@
                 comando dir (o ls
                 --la)](#verificar-que-el-código-se-ha-descargado-mediante-comando-dir-o-ls-la)
             -   [Verificar cuál es el espacio de trabajo (echo
-                %WORKSPACE% o echo $WORKSPACE)
-                Se realizar un procedimiento analogo al punto anterior.
-                ```groovy
-                pipeline {
-                    agent any
-                    environment {
-                        GIT_TOKEN=credentials ('dargamenteria_github_token')
-                    }
-                    stages {
-                        stage('get code from repo') {
-                            steps {
-                               sh ('''
-                                    git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A](#verificar-cuál-es-el-espacio-de-trabajo-echo-workspace-o-echo-workspace-se-realizar-un-procedimiento-analogo-al-punto-anterior.-groovy-pipeline-agent-any-environment-git_tokencredentials-dargamenteria_github_token-stages-stageget-code-from-repo-steps-sh-git-clone-httpsgit_tokengithub.comdargamenteriaactividad1-a)
+                %WORKSPACE% o echo
+                \$WORKSPACE)](#verificar-cuál-es-el-espacio-de-trabajo-echo-workspace-o-echo-workspace)
         -   [Prueba 2](#prueba-2)
         -   [Prueba 3](#prueba-3)
 
@@ -638,7 +627,7 @@ La salida de la pipeline se muetra a continuación.
 
 Se copia utiliza la opción de copiar elementos de Jenkins para realizar
 una copia de la pipeline anterior y añadir el codigo para listar el
-directorio y verificar la existencia del repositorio
+directorio y verificar la existencia del repositorio.
 
 ``` groovy
 pipeline {
@@ -663,9 +652,11 @@ pipeline {
 
 ![58f5c70212104216feb0ebb05f6083ab.png](_resources/58f5c70212104216feb0ebb05f6083ab.png)
 
-#### Verificar cuál es el espacio de trabajo (echo %WORKSPACE% o echo $WORKSPACE)
+#### Verificar cuál es el espacio de trabajo (echo %WORKSPACE% o echo \$WORKSPACE)
+
 Se realizar un procedimiento analogo al punto anterior.
-```groovy
+
+``` groovy
 pipeline {
     agent any
     environment {
@@ -676,7 +667,6 @@ pipeline {
             steps {
                sh ('''
                     git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
-
                     ls -arlt 
                     echo $WORKSPACE
                 '''
@@ -685,46 +675,49 @@ pipeline {
             }
         }
     }
-
 }
+```
 
+![d63b5d6d9c41716f480a55676bf28a02.png](_resources/d63b5d6d9c41716f480a55676bf28a02.png)
+\#### Añadir etapa "Build" (que no hace nada realmente) Realizamos el
+mismo proceso que en los puntos anteriores. Hemos tenido que limpiar el
+workspace para evitar un error de clonado de git ya que se había
+descargado previamente el repositorio.
 
-    ![d63b5d6d9c41716f480a55676bf28a02.png](_resources/d63b5d6d9c41716f480a55676bf28a02.png)
-    #### Añadir etapa “Build” (que no hace nada realmente)
-    Realizamos el mismo proceso que en los puntos anteriores. Hemos tenido que limpiar el workspace para evitar un error de clonado de git ya que se había descargado previamente el repositorio.
+![ddad5926ec2308ed7547c393e97a6a6f.png](_resources/ddad5926ec2308ed7547c393e97a6a6f.png)
+![fbfb2876e4d18231097a6a84aeb1a6ab.png](_resources/fbfb2876e4d18231097a6a84aeb1a6ab.png)
 
-    ![ddad5926ec2308ed7547c393e97a6a6f.png](_resources/ddad5926ec2308ed7547c393e97a6a6f.png)
-    ![fbfb2876e4d18231097a6a84aeb1a6ab.png](_resources/fbfb2876e4d18231097a6a84aeb1a6ab.png)
+También se puede añadir el borrado en la pipeline como se muestra a
+continuación:
 
-    También se puede añadir el borrado en la pipeline como se muestra a continuación
-
-    ```groovy
-    pipeline {
-        agent any
-        environment {
-            GIT_TOKEN=credentials ('dargamenteria_github_token')
-        }
-        stages {
-            stage('get code from repo') {
-                steps {
-                   sh ('''
-                        [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
-                        git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
-                        ls -arlt 
-                        echo $WORKSPACE
-                    '''
-                   )
-                   
-                }
+``` groovy
+pipeline {
+    agent any
+    environment {
+        GIT_TOKEN=credentials ('dargamenteria_github_token')
+    }
+    stages {
+        stage('get code from repo') {
+            steps {
+               sh ('''
+                    [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
+                    git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
+                    ls -arlt 
+                    echo $WORKSPACE
+                '''
+               )
+               
             }
-            
-            stage ('Build phase') {
-                steps {
-                    sh ('echo "Build phase" ')
-                }
+        }
+        
+        stage ('Build phase') {
+            steps {
+                sh ('echo "Build phase" ')
             }
         }
     }
+}
+```
 
 ### Prueba 2
 
