@@ -1,20 +1,20 @@
--   [Reto1](#reto1){#toc-reto1}
+-   [Reto1](#reto1)
     -   [Clonado del proyecto con
-        Github](#clonado-del-proyecto-con-github){#toc-clonado-del-proyecto-con-github}
+        Github](#clonado-del-proyecto-con-github)
     -   [Securización local del repositorio
-        git](#securización-local-del-repositorio-git){#toc-securización-local-del-repositorio-git}
+        git](#securización-local-del-repositorio-git)
     -   [Pruebas de integración con flask y
-        wiremock](#pruebas-de-integración-con-flask-y-wiremock){#toc-pruebas-de-integración-con-flask-y-wiremock}
+        wiremock](#pruebas-de-integración-con-flask-y-wiremock)
         -   [Unit test con
-            pytest](#unit-test-con-pytest){#toc-unit-test-con-pytest}
+            pytest](#unit-test-con-pytest)
         -   [Pruebas con flask y
-            wiremock](#pruebas-con-flask-y-wiremock){#toc-pruebas-con-flask-y-wiremock}
-    -   [Jenkins](#jenkins){#toc-jenkins}
-        -   [Arquitectura](#arquitectura){#toc-arquitectura}
-        -   [Instalación](#instalación){#toc-instalación}
-        -   [Prueba 1](#prueba-1){#toc-prueba-1}
-        -   [Prueba 2](#prueba-2){#toc-prueba-2}
-        -   [Prueba 3](#prueba-3){#toc-prueba-3}
+            wiremock](#pruebas-con-flask-y-wiremock)
+    -   [Jenkins](#jenkins)
+        -   [Arquitectura](#arquitectura)
+        -   [Instalación](#instalación)
+        -   [Prueba 1](#prueba-1)
+        -   [Prueba 2](#prueba-2)
+        -   [Prueba 3](#prueba-3)
 
 # Reto1
 
