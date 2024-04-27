@@ -12,7 +12,18 @@
     -   [Jenkins](#jenkins)
         -   [Arquitectura](#arquitectura)
         -   [Instalación](#instalación)
+            -   [Pruebas de
+                conectividad](#pruebas-de-conectividad)
         -   [Prueba 1](#prueba-1)
+            -   [Crear y ejecutar un pipeline simple, una sola etapa con
+                un
+                "echo"](#crear-y-ejecutar-un-pipeline-simple-una-sola-etapa-con-un-echo)
+            -   [Añadir un comando git para traer todo el código fuente
+                del
+                repositorio](#añadir-un-comando-git-para-traer-todo-el-código-fuente-del-repositorio)
+            -   [Verificar que el código se ha descargado mediante
+                comando dir (o ls
+                --la)](#verificar-que-el-código-se-ha-descargado-mediante-comando-dir-o-ls-la)
         -   [Prueba 2](#prueba-2)
         -   [Prueba 3](#prueba-3)
 
@@ -555,7 +566,8 @@ Se realizan pruebas de conectividad entre:
 
 ### Prueba 1
 
-####Crear y ejecutar un pipeline simple, una sola etapa con un "echo"\
+#### Crear y ejecutar un pipeline simple, una sola etapa con un "echo"
+
 Se crea una sencilla pipeline con el script que se muestra abajo
 
 1.  Se crea la pipeline Jenkins1_1
