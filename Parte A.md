@@ -30,7 +30,25 @@
             -   [Añadir etapa "Build" (que no hace nada
                 realmente)](#añadir-etapa-build-que-no-hace-nada-realmente)
         -   [Prueba 2](#prueba-2)
+            -   [Añadir etapa Unit lanzando solo las pruebas
+                unitarias](#añadir-etapa-unit-lanzando-solo-las-pruebas-unitarias)
+            -   [Añadir etapa Service (secuencial) lanzado las pruebas
+                de
+                servicio](#añadir-etapa-service-secuencial-lanzado-las-pruebas-de-servicio)
+            -   [Convertir ambas etapas para se ejecuten en
+                paralelo](#convertir-ambas-etapas-para-se-ejecuten-en-paralelo)
+            -   [Añadir una etapa posterior para conectar con
+                JUnit](#añadir-una-etapa-posterior-para-conectar-con-junit)
         -   [Prueba 3](#prueba-3)
+            -   [Crear un pipeline donde se use un Jenkinsfile de
+                vuestro repositorio en
+                GitHub](#crear-un-pipeline-donde-se-use-un-jenkinsfile-de-vuestro-repositorio-en-github)
+                -   [Activar polling en Jenkins para que se ejecute el
+                    pipeline cuando haya
+                    cambios](#activar-polling-en-jenkins-para-que-se-ejecute-el-pipeline-cuando-haya-cambios)
+                -   [Hacer cualquier cambio en el código y verificar que
+                    se ejecuta el
+                    pipeline](#hacer-cualquier-cambio-en-el-código-y-verificar-que-se-ejecuta-el-pipeline)
 
 # Reto1
 
@@ -600,7 +618,7 @@ pipeline {
 
 Para conectarse al repositorio de git es necesario la utilización de un
 token. Almacenamos el valor del token en una credencial de tipo secret
-en Jenkins
+en Jenkins\
 ![2b3538437ff4d8191a3fdffb1cfb9542.png](_resources/2b3538437ff4d8191a3fdffb1cfb9542.png)
 
 Como en el caso anterior creamos el pipeline y el script que se muestra
@@ -622,7 +640,7 @@ pipeline {
 }
 ```
 
-La salida de la pipeline se muetra a continuación.
+La salida de la pipeline se muetra a continuación.\
 ![47822eb917d13f2cfb842cb2c9d45f7f.png](_resources/47822eb917d13f2cfb842cb2c9d45f7f.png)
 
 #### Verificar que el código se ha descargado mediante comando dir (o ls --la)
@@ -688,7 +706,7 @@ Realizamos el mismo proceso que en los puntos anteriores. Hemos tenido
 que limpiar el workspace para evitar un error de clonado de git ya que
 se había descargado previamente el repositorio.
 
-![ddad5926ec2308ed7547c393e97a6a6f.png](_resources/ddad5926ec2308ed7547c393e97a6a6f.png)
+![ddad5926ec2308ed7547c393e97a6a6f.png](_resources/ddad5926ec2308ed7547c393e97a6a6f.png)\
 ![fbfb2876e4d18231097a6a84aeb1a6ab.png](_resources/fbfb2876e4d18231097a6a84aeb1a6ab.png)
 
 También se puede añadir el borrado en la pipeline como se muestra a
@@ -725,4 +743,256 @@ pipeline {
 
 ### Prueba 2
 
+Para estas pruebas hemos decido usar una instalación de jenkins
+directamente sobre el nodo.
+
+    sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+      https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+      https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+      /etc/apt/sources.list.d/jenkins.list > /dev/null
+    sudo apt-get update
+    sudo apt-get install jenkins
+
+    $ systemctl status jenkins
+    ● jenkins.service - Jenkins Continuous Integration Server
+         Loaded: loaded (/lib/systemd/system/jenkins.service; enabled; vendor preset: enabled)
+         Active: active (running) since Sat 2024-04-27 20:12:12 UTC; 10s ago
+       Main PID: 16854 (java)
+          Tasks: 50 (limit: 11883)
+         Memory: 2.6G
+            CPU: 48.624s
+         CGroup: /system.slice/jenkins.service
+                 └─16854 /usr/bin/java -Djava.awt.headless=true -jar /usr/share/java/jenkins.war --webroot=/var/cache/jenkins/war --httpPort=8080
+
+    Apr 27 20:11:52 docker.paranoidworld.es jenkins[16854]: 4b34b4925cf64375b6f7592c98c94b10
+    Apr 27 20:11:52 docker.paranoidworld.es jenkins[16854]: This may also be found at: /var/lib/jenkins/secrets/initialAdminPassword
+    Apr 27 20:11:52 docker.paranoidworld.es jenkins[16854]: *************************************************************
+    Apr 27 20:11:52 docker.paranoidworld.es jenkins[16854]: *************************************************************
+    Apr 27 20:11:52 docker.paranoidworld.es jenkins[16854]: *************************************************************
+    Apr 27 20:12:12 docker.paranoidworld.es jenkins[16854]: 2024-04-27 20:12:12.769+0000 [id=30]        INFO        jenkins.InitReactorRunner$1#onAttained: Comple>
+    Apr 27 20:12:12 docker.paranoidworld.es jenkins[16854]: 2024-04-27 20:12:12.861+0000 [id=22]        INFO        hudson.lifecycle.Lifecycle#onReady: Jenkins is>
+    Apr 27 20:12:12 docker.paranoidworld.es systemd[1]: Started Jenkins Continuous Integration Server.
+    Apr 27 20:12:13 docker.paranoidworld.es jenkins[16854]: 2024-04-27 20:12:13.223+0000 [id=47]        INFO        h.m.DownloadService$Downloadable#load: Obtaine>
+    Apr 27 20:12:13 docker.paranoidworld.es jenkins[16854]: 2024-04-27 20:12:13.225+0000 [id=47]        INFO        hudson.util.Retrier#start: Performed the actio>
+    lines 1-20/20 (END)
+
+#### Añadir etapa Unit lanzando solo las pruebas unitarias
+
+Partimos de la pipeline Jenkins1_5 . Y añadimos la fase de testing donde
+hemos de ajustar las variables de entorno para python y ejecutar el
+comando pytest.
+
+    pipeline {
+        agent any
+        environment {
+            GIT_TOKEN=credentials ('dargamenteria_github_token')
+        }
+        stages {
+            stage('get code from repo') {
+                steps {
+                   sh ('''
+                        [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
+                        git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
+                        ls -arlt 
+                        echo $WORKSPACE
+                    '''
+                   )
+                   
+                }
+            }
+            
+            stage ('Test phase') {
+                steps {
+                    sh ('''
+                        echo "Test phase" 
+                        cd "$WORKSPACE/actividad1-A"
+                        export PYTHONPATH=.
+                        pytest-3 $(pwd)/test/unit
+
+                        
+                    ''')
+                }
+            }
+        }
+    }
+
+![a45e4184a53600dce579105c8279ba99.png](_resources/a45e4184a53600dce579105c8279ba99.png)
+
+#### Añadir etapa Service (secuencial) lanzado las pruebas de servicio
+
+En esta fase hemos encontrado un comportamiento anomalo en la ejecución
+de los comando dentro de la stage:
+
+``` groovy
+sh ('''
+                   echo "Test phase" 
+                   echo $WORKSPACE
+                   export FLASK_APP=$WORKSPACE/actividad1-A/app/api.py
+                   flask run &
+                   java -jar /app/wiremock/wiremock-standalone-3.5.4.jar --port 9090  --root-dir "$WORKSPACE/actividad1-A/test/wiremock" &
+                   export PYTHONPATH=$WORKSPACE/actividad1-A
+                   
+                   sleep 10
+                   #curl  -vvv http://localhost:9090/calc/sqrt/64
+                   pytest-3 $WORKSPACE/actividad1-A/test/rest
+
+              ''')
+```
+
+Si observamos la siguente salida de consola de la ejecución del bloque
+sh, Vemos que el comando curl falla al no poder conectarse al puerto
+9090, esto es debido a que las aplicaciones flask y wiremock se lanzan
+en segundo plano y pasan la ejecución inmediatamente al siguiente
+comando. Esto puede hacer que en determinadas ocasiones los servidores
+no se levanten correctamente.
+
+``` bash
++ export FLASK_APP=/var/lib/jenkins/workspace/Jenkins2_2@2/actividad1-A/app/api.py
+
+- export PYTHONPATH=/var/lib/jenkins/workspace/Jenkins2_2@2/actividad1-A 
+- curl -vvv http://localhost:9090/calc/sqrt/64
+- nohup flask run
+- nohup java -jar /app/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --verbose --root-dir /var/lib/jenkins/workspace/Jenkins2_2@2/actividad1-A/test/wiremock  
+    \* Trying 127.0.0.1:9090...  
+    % Total % Received % Xferd Average Speed Time Time Time Current  
+    Dload Upload Total Spent Left Speed
+
+    0 0 0 0 0 0 0 0 --:--:-- --:--:-- --:--:-- 0\* connect to 127.0.0.1 port 9090 failed: Connection refused  
+    \* Trying ::1:9090...  
+    \* connect to ::1 port 9090 failed: Connection refused  
+    \* Failed to connect to localhost port 9090 after 0 ms: Connection refused
+    
+    0 0 0 0 0 0 0 0 --:--:-- --:--:-- --:--:-- 0  
+    \* Closing connection 0  
+    curl: (7) Failed to connect to localhost port 9090 after 0 ms: Connection refused
+```
+
+Hay dos soluciones, un bucle de espera activo que verifique la conexión
+a los puertos 9090 y 5000 o una espera arbitrariamente grande por
+ejemplo 10 segundos
+
+``` groovy
+stage ('Test Rest phase') {
+           steps {
+               sh ('''
+                   echo "Test phase" 
+                   cd "$WORKSPACE/actividad1-A"
+                   export PYTHONPATH=.
+                   export FLASK_APP=$(pwd)/app/api.py
+                   flask run &
+                   java -jar /app/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
+                   sleep 10
+                   pytest-3 $(pwd)/test/rest
+               ''')
+           }
+       }
+```
+
+#### Convertir ambas etapas para se ejecuten en paralelo
+
+A continuación se muestra el codigo de la pipeline:
+
+``` groovy
+pipeline {
+    agent any
+    environment {
+        GIT_TOKEN=credentials ('dargamenteria_github_token')
+    }
+    stages {
+        stage('get code from repo') {
+            steps {
+               sh ('''
+                    [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
+                    git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
+                    ls -arlt 
+                    echo $WORKSPACE
+                '''
+               )
+               
+            }
+        }
+         stage('Test phase') {
+      parallel {
+        stage ('Test phase') {
+            steps {
+                sh ('''
+                    echo "Test phase" 
+                    cd "$WORKSPACE/actividad1-A"
+                    export PYTHONPATH=.
+                    pytest-3 $(pwd)/test/unit
+
+                    
+                ''')
+            }
+        }
+        stage ('Test Rest phase') {
+            steps {
+                sh ('''
+                    echo "Test phase" 
+                    cd "$WORKSPACE/actividad1-A"
+                    export PYTHONPATH=.
+                    export FLASK_APP=$(pwd)/app/api.py
+                    flask run &
+                    java -jar /app/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
+                    sleep 10
+                    pytest-3 $(pwd)/test/rest
+
+                ''')
+            }
+        }
+      }
+    }   
+        
+        
+        
+    }
+}
+```
+
+El resultado de la ejecución de la pipeline:\
+![7e34723b935e0b6847dbabb54eb0113e.png](_resources/7e34723b935e0b6847dbabb54eb0113e.png)
+
+#### Añadir una etapa posterior para conectar con JUnit
+
+Se muestra el código de la etapa pedida
+
+``` goovy
+stage ('Result Test'){  
+steps {  
+sh ('''  
+echo $(pwd) file "$(pwd)/actividad1-A/result-*.xml"  
+''')  
+junit '$(pwd)/actividad1-A/result-*.xml'  
+}  
+}
+```
+
 ### Prueba 3
+
+#### Crear un pipeline donde se use un Jenkinsfile de vuestro repositorio en GitHub
+
+El proyecto ejecuta el codigo de la pipeline repositado en el fichero
+Jenkinsfile de la rama Master del repositorio
+https://github.com/dargamenteria/actividad1-A/
+
+![d22bf5229ac82c03da63d611afa4bef9.png](_resources/d22bf5229ac82c03da63d611afa4bef9.png)
+
+##### Activar polling en Jenkins para que se ejecute el pipeline cuando haya cambios
+
+Configuramos temporalmente el pooling cada 5 minutos
+
+![a91cbc5590801aae7b38c50baeea0f6c.png](_resources/a91cbc5590801aae7b38c50baeea0f6c.png)
+
+##### Hacer cualquier cambio en el código y verificar que se ejecuta el pipeline
+
+Se modifica el fichero Jenkinsfile con el mismo código que la pipeline
+del punto 2.4\
+![04cbf7716056a38e362cf14d221f02fa.png](_resources/04cbf7716056a38e362cf14d221f02fa.png)\
+![d8ed10bd48fdda8881e32b976f9ab2b6.png](_resources/d8ed10bd48fdda8881e32b976f9ab2b6.png)\
+![d911e2fe1e9d62c4f4c419a7d2ccaee3.png](_resources/d911e2fe1e9d62c4f4c419a7d2ccaee3.png)
+
+ Crear item Jenkins de tipo "Multibranch pipeline", conectado con el
+repositorio\
+ Verificar que se pueden ejecutar los pipelines de cada rama\
+ Bloquear la capacidad de ejecución del pipeline para la rama developj
