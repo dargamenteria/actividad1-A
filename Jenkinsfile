@@ -1,14 +1,60 @@
 pipeline {
-    agent any
+  agent any
+    environment {
+      GIT_TOKEN=credentials ('dargamenteria_github_token')
+    }
+  stages {
+    stage('get code from repo') {
+      steps {
+        sh ('''
+            [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
+            git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
+            ls -arlt 
+            echo $WORKSPACE
+            '''
+           )
 
-     stages {
+      }
+    }
+    stage('Test phase') {
+      parallel {
+        stage ('Test phase') {
+          steps {
+            sh ('''
+                echo "Test phase" 
+                cd "$WORKSPACE/actividad1-A"
+                export PYTHONPATH=.
+                pytest-3 --junitxml=result-test.xml $(pwd)/test/unit
 
-        stage('Build') {
-           steps {
-              echo 'Eyyy, esto es Python. No hay que compilar nada!!!'
-	          echo WORKSPACE
-              sh 'ls -la'
-           }
+
+                ''')
+          }
         }
-     }
+        stage ('Test Rest phase') {
+          steps {
+            sh ('''
+                echo "Test phase" 
+                cd "$WORKSPACE/actividad1-A"
+                export PYTHONPATH=.
+                export FLASK_APP=$(pwd)/app/api.py
+                flask run &
+                java -jar /app/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
+                sleep 10
+                pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
+
+                ''')
+          }
+        }
+      }
+    }   
+    stage ('Result Test'){
+      steps {
+        sh ('''
+            echo $(pwd)
+            ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
+            ''')
+      }
+    }
+  }
 }
+
