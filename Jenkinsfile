@@ -52,6 +52,7 @@ pipeline {
         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
           sh ('''
             echo $(pwd)
+            sleep 10
             ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
        		  junit '$(pwd)/actividad1-A/result-*.xml'  
           ''')
