@@ -55,7 +55,6 @@ pipeline {
       steps {
           sh ('Deploy Master')
         }
-      }
     }
     stage ('Deploy qa'){
       when {
@@ -64,7 +63,6 @@ pipeline {
       steps {
           sh ('Deploy QA')
         }
-      }
     } 
     stage ('Deploy Prod'){
 
@@ -74,7 +72,6 @@ pipeline {
       steps {
           sh ('Deploy PROD')
         }
-      }
     }
     stage ('Result Test'){
       steps {
