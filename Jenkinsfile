@@ -49,10 +49,13 @@ pipeline {
     }   
     stage ('Result Test'){
       steps {
-        sh ('''
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+          sh ('''
             echo $(pwd)
             ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
-            ''')
+       		  junit '$(pwd)/actividad1-A/result-*.xml'  
+          ''')
+        }
       }
     }
   }
