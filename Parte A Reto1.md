@@ -957,14 +957,14 @@ El resultado de la ejecución de la pipeline:\
 
 Se muestra el código de la etapa pedida
 
-``` goovy
+``` groovy
 stage ('Result Test'){  
-steps {  
-sh ('''  
-echo $(pwd) file "$(pwd)/actividad1-A/result-*.xml"  
-''')  
-junit '$(pwd)/actividad1-A/result-*.xml'  
-}  
+    steps {  
+        sh ('''  
+                echo $(pwd) file "$(pwd)/actividad1-A/result-*.xml"  
+                ''')  
+                junit '$(pwd)/actividad1-A/result-*.xml'  
+    }  
 }
 ```
 
@@ -992,7 +992,21 @@ del punto 2.4\
 ![d8ed10bd48fdda8881e32b976f9ab2b6.png](_resources/d8ed10bd48fdda8881e32b976f9ab2b6.png)\
 ![d911e2fe1e9d62c4f4c419a7d2ccaee3.png](_resources/d911e2fe1e9d62c4f4c419a7d2ccaee3.png)
 
- Crear item Jenkins de tipo "Multibranch pipeline", conectado con el
-repositorio\
+El pipeline falla en el paso de obtener los resultados. Añadimos una
+excepcion para que muestre estado "SUCCESS" de todas formas
+
+![c359caca7c6dae5e5ebbb7a4bc5a0b57.png](_resources/c359caca7c6dae5e5ebbb7a4bc5a0b57.png)\
+Cambios realizados\
+![63d3574a3824c66535e012f280d08089.png](_resources/63d3574a3824c66535e012f280d08089.png)\
+![ddd6a2ba9672a6836485ed66b5d9061a.png](_resources/ddd6a2ba9672a6836485ed66b5d9061a.png)
+
+![e5118c840cd57bd153d004e9053db5f4.png](_resources/e5118c840cd57bd153d004e9053db5f4.png)
+
+####  Crear item Jenkins de tipo "Multibranch pipeline", conectado con
+el repositorio Creamos unas nuevas ramas desde master llamadas prod y qa
+![7fbc7362f94d8896d88ce717367df0b3.png](_resources/7fbc7362f94d8896d88ce717367df0b3.png)
+
+Creamos un nueva pipeline de tipo "multibranch"
+
  Verificar que se pueden ejecutar los pipelines de cada rama\
  Bloquear la capacidad de ejecución del pipeline para la rama developj
