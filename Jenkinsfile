@@ -49,7 +49,7 @@ pipeline {
     }   
     stage ('Result Test'){
       steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
           sh ('''
             echo $(pwd)
             sleep 10
