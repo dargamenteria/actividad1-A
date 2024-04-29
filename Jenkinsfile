@@ -48,6 +48,15 @@ pipeline {
       }
     }   
 
+    stage ('Deploy master'){
+      when {
+        branch 'master'
+      }
+      steps {
+          sh ('Deploy Master')
+        }
+      }
+    }
     stage ('Deploy qa'){
       when {
         branch 'qa'
