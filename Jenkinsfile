@@ -1,8 +1,15 @@
-pipeline {
+@Library('pipeline-library-demo')_
+
+
+ pipeline {
   agent any
     environment {
       GIT_TOKEN=credentials ('dargamenteria_github_token')
     }
+ stage('Demo') {
+     echo 'Hello world'
+     sayHello 'Alex'
+ }
   stages {
     stage('get code from repo') {
       steps {
