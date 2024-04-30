@@ -48,31 +48,6 @@ pipeline {
       }
     }   
 
-    stage ('Deploy master'){
-      when {
-        branch 'master'
-      }
-      steps {
-          sh ('Deploy Master')
-        }
-    }
-    stage ('Deploy qa'){
-      when {
-        branch 'qa'
-      }
-      steps {
-          sh ('Deploy QA')
-        }
-    } 
-    stage ('Deploy Prod'){
-
-      when {
-        branch 'prod'
-      }
-      steps {
-          sh ('Deploy PROD')
-        }
-    }
     stage ('Result Test'){
       steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
