@@ -10,7 +10,7 @@ pipeline {
     stage('Pipeline Info') {
       steps {
         sh ('echo "        pipelineBanner "')
-        pipelineBanner()
+          pipelineBanner()
       }
     }
     stage('get code from repo') {
@@ -22,6 +22,7 @@ pipeline {
             echo $WORKSPACE
             '''
            )
+          stash  (name: 'workspace')
 
       }
     }
@@ -29,18 +30,19 @@ pipeline {
       parallel {
         stage ('Test phase') {
           steps {
+            unstash 'workspace'
             sh ('''
                 echo "Test phase" 
                 cd "$WORKSPACE/actividad1-A"
                 export PYTHONPATH=.
                 pytest-3 --junitxml=result-test.xml $(pwd)/test/unit
-
-
-                ''')
+            ''')
           }
         }
+
         stage ('Test Rest phase') {
           steps {
+            unstash 'workspace'
             sh ('''
                 echo "Test phase" 
                 cd "$WORKSPACE/actividad1-A"
@@ -60,6 +62,7 @@ pipeline {
     stage ('Result Test'){
       steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+          unstash 'workspace'
           sh ('''
               echo $(pwd)
               sleep 10
