@@ -47,7 +47,7 @@ pipeline {
                 export PYTHONPATH=.
                 export FLASK_APP=$(pwd)/app/api.py
                 flask run &
-                java -jar /app/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
+                java -jar /apps/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
                 sleep 10
                 pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
 

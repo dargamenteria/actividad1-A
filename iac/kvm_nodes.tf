@@ -82,7 +82,9 @@ resource "null_resource" "provisioner" {
       "sudo growpart /dev/vda 1",
       "sudo apt install -y ca-certificates curl python3-flask",
       "sudo mkdir -p /apps/wiremock",
-      "sudo curl https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.5.4/wiremock-standalone-3.5.4.jar -o /apps/wiremock/wiremock.jar ",
+      "sudo curl --create-dirs -O --output-dir /apps/wiremock https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.5.4/wiremock-standalone-3.5.4.jar",
+      "sudo chmod -R 755 /apps/wiremock",
+      "sudo chmod +x  /apps/wiremock/wiremock-standalone-3.5.4.jar",
     ]
 
     connection {
