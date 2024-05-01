@@ -6,9 +6,8 @@
     environment {
       GIT_TOKEN=credentials ('dargamenteria_github_token')
     }
- stage('Demo') {
-     echo 'Hello world'
-     sayHello 'Alex'
+ stage('Pipeline Info') {
+     pipelineBanner 
  }
   stages {
     stage('get code from repo') {
