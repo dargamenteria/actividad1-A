@@ -8,7 +8,9 @@ pipeline {
     }
   stages {
     stage('Pipeline Info') {
-      pipelineBanner 
+      steps {
+        pipelineBanner 
+      }
     }
     stage('get code from repo') {
       steps {
