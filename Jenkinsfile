@@ -14,7 +14,7 @@ pipeline {
       }
     }
     stage('get code from repo') {
-      agent { label: 'agent2' }
+      agent { label 'agent2' }
       steps {
         pipelineBanner()
         sh ('''
