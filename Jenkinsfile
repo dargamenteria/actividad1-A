@@ -9,7 +9,7 @@ pipeline {
   stages {
     stage('Pipeline Info') {
       steps {
-        pipelineBanner 
+        sh ('echo "        pipelineBanner '")
       }
     }
     stage('get code from repo') {
