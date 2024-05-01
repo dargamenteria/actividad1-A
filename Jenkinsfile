@@ -14,7 +14,9 @@ pipeline {
       }
     }
     stage('get code from repo') {
+      agent { label: 'code' }
       steps {
+        pipelineBanner()
         sh ('''
             [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
             git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
@@ -30,6 +32,7 @@ pipeline {
       parallel {
         stage ('Test phase') {
           steps {
+            pipelineBanner()
             unstash 'workspace'
             sh ('''
                 echo "Test phase" 
@@ -41,7 +44,9 @@ pipeline {
         }
 
         stage ('Test Rest phase') {
+          agent { label 'test' }
           steps {
+            pipelineBanner()
             unstash 'workspace'
             sh ('''
                 echo "Test phase" 
@@ -60,7 +65,9 @@ pipeline {
     }   
 
     stage ('Result Test'){
+      agent { label 'test' }
       steps {
+        pipelineBanner()
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
           unstash 'workspace'
           sh ('''
