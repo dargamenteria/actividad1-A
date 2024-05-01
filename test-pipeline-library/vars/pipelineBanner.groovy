@@ -6,4 +6,5 @@ def call() {
       echo "Hostinfo: $(uname -a)"
     ''')
   }
+}
 
