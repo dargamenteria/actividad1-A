@@ -49,6 +49,15 @@
                 -   [Hacer cualquier cambio en el código y verificar que
                     se ejecuta el
                     pipeline](#hacer-cualquier-cambio-en-el-código-y-verificar-que-se-ejecuta-el-pipeline)
+            -   [Crear item Jenkins de tipo "Multibranch pipeline",
+                conectado con el
+                repositorio](#crear-item-jenkins-de-tipo-multibranch-pipeline-conectado-con-el-repositorio)
+                -   [Verificar que se pueden ejecutar los pipelines de
+                    cada
+                    rama](#verificar-que-se-pueden-ejecutar-los-pipelines-de-cada-rama)
+                -   [Bloquear la capacidad de ejecución del pipeline
+                    para la rama
+                    developj](#bloquear-la-capacidad-de-ejecución-del-pipeline-para-la-rama-developj)
 
 # Reto1
 
@@ -1002,11 +1011,30 @@ Cambios realizados\
 
 ![e5118c840cd57bd153d004e9053db5f4.png](_resources/e5118c840cd57bd153d004e9053db5f4.png)
 
-####  Crear item Jenkins de tipo "Multibranch pipeline", conectado con
-el repositorio Creamos unas nuevas ramas desde master llamadas prod y qa
+#### Crear item Jenkins de tipo "Multibranch pipeline", conectado con el repositorio
+
+Creamos unas nuevas ramas desde master llamadas prod, qa y develop\
 ![7fbc7362f94d8896d88ce717367df0b3.png](_resources/7fbc7362f94d8896d88ce717367df0b3.png)
 
 Creamos un nueva pipeline de tipo "multibranch"
+![fbf57bb8135d7c79ebc59d1c522a911c.png](_resources/fbf57bb8135d7c79ebc59d1c522a911c.png)
+![5d3aed0373d63c8f93914e93f59eb055.png](_resources/5d3aed0373d63c8f93914e93f59eb055.png)
+![de2c74738ed6691486d6d5348990ee2d.png](_resources/de2c74738ed6691486d6d5348990ee2d.png)
 
- Verificar que se pueden ejecutar los pipelines de cada rama\
- Bloquear la capacidad de ejecución del pipeline para la rama developj
+##### Verificar que se pueden ejecutar los pipelines de cada rama
+
+En la siguiente imagen se muestra la ejecucuón de la rama master
+ejectuando la fase "Deploy Prod" y saltando las de "Deploy Master" y
+"Deploy Qa"
+![fd26c019f3b9486cf31cd508590db243.png](_resources/fd26c019f3b9486cf31cd508590db243.png)
+![373f06a132ab8e2bd51a1f8372433b35.png](_resources/373f06a132ab8e2bd51a1f8372433b35.png)
+
+Aunque no es estable el proceso de ejecución de las pipelines.
+![1a5b6ddf7ab5701c411fabb749c106d7.png](_resources/1a5b6ddf7ab5701c411fabb749c106d7.png)
+
+##### Bloquear la capacidad de ejecución del pipeline para la rama developj
+
+De esta forma filtramos las ramas. En nuestro caso de esta forma
+excluimos develop
+
+![9b81207d02ae20e9fee1e8d17451b9a5.png](_resources/9b81207d02ae20e9fee1e8d17451b9a5.png)

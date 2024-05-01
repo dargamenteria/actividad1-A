@@ -5,7 +5,7 @@ cd ${0%\/*}
 [ $# -ne 1 ] && exit 1
 
 cp "UNI/Practica1/${1}" .
-rm -fr UNI
+#rm -fr UNI
 sed -i s'/..\/..\/_resources/_resources/g' "${1}"
 
 #get rid of the jopin export header
