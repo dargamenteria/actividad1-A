@@ -14,7 +14,7 @@ pipeline {
       }
     }
     stage('get code from repo') {
-      agent { label: 'code' }
+      agent { label: 'agen2' }
       steps {
         pipelineBanner()
         sh ('''
@@ -31,6 +31,7 @@ pipeline {
     stage('Test phase') {
       parallel {
         stage ('Test phase') {
+          agent { label 'agent1' }
           steps {
             pipelineBanner()
             unstash 'workspace'
@@ -44,7 +45,7 @@ pipeline {
         }
 
         stage ('Test Rest phase') {
-          agent { label 'test' }
+          agent { label 'agent1' }
           steps {
             pipelineBanner()
             unstash 'workspace'
@@ -65,7 +66,7 @@ pipeline {
     }   
 
     stage ('Result Test'){
-      agent { label 'test' }
+      agent { label 'agent1' }
       steps {
         pipelineBanner()
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
