@@ -1,15 +1,15 @@
 @Library('test-pipeline-library')_
 
 
- pipeline {
+pipeline {
   agent any
     environment {
       GIT_TOKEN=credentials ('dargamenteria_github_token')
     }
- stage('Pipeline Info') {
-     pipelineBanner 
- }
   stages {
+    stage('Pipeline Info') {
+      pipelineBanner 
+    }
     stage('get code from repo') {
       steps {
         sh ('''
@@ -58,13 +58,13 @@
       steps {
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
           sh ('''
-            echo $(pwd)
-            sleep 10
-            ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
-            junit '**/result*.xml' 
+              echo $(pwd)
+              sleep 10
+              ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
+              junit '**/result*.xml' 
 
-       		  junit '$(pwd)/actividad1-A/result-*.xml'  
-          ''')
+       		    junit '$(pwd)/actividad1-A/result-*.xml'  
+              ''')
         }
       }
     }
