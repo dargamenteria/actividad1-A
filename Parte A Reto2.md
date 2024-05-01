@@ -16,77 +16,90 @@ Para este apartado utilizaremos la infraestructura definida en el Reto 1
     -   slave2: 192.168.150.229
 
 En la siguiente imagen se muestran los nodos activos\
-![bdc8c910adacea6bb389f19b45cd24bc.png](_resources/bdc8c910adacea6bb389f19b45cd24bc.png)
+![bdc8c910adacea6bb389f19b45cd24bc.png](_resources/bdc8c910adacea6bb389f19b45cd24bc-1.png)
 
 Habilitamos la comunicación de los agentes\
-![1729f9bc463ce4f580148082f66d2cde.png](_resources/1729f9bc463ce4f580148082f66d2cde.png)
+![1729f9bc463ce4f580148082f66d2cde.png](_resources/1729f9bc463ce4f580148082f66d2cde-1.png)
 
-![c00895e1302d0539a0be69a641f2c42a.png](_resources/c00895e1302d0539a0be69a641f2c42a.png)
+![c00895e1302d0539a0be69a641f2c42a.png](_resources/c00895e1302d0539a0be69a641f2c42a-1.png)
 
-![ae75731e5df5925d4ad25a81a69ed60f.png](_resources/ae75731e5df5925d4ad25a81a69ed60f.png)
+![ae75731e5df5925d4ad25a81a69ed60f.png](_resources/ae75731e5df5925d4ad25a81a69ed60f-1.png)
 
 En este punto tenemos 2 agentes conectados a Jenkins
 
 Probamos la conexión via SSH con el mismo resultado\
-![a9f452c9e5e833687ad02fd79fa06e58.png](_resources/a9f452c9e5e833687ad02fd79fa06e58.png)
+![a9f452c9e5e833687ad02fd79fa06e58.png](_resources/a9f452c9e5e833687ad02fd79fa06e58-1.png)
 
 ## Pruebas de conexión a los agentes y stash/unstash
 
 Para realizar de ejecución de las distintas fases de la pipeline en
 varios agentes además del uso de la funcionalidad stash/unstash
-utilizaremos el siguiente etiquetado para los nodos esclavo\
-\|Nodo\|Etiqueta\|\
-\|----\|--------\| \|slave1\|agent1\|\
-\|slave2\|agent2\|
+utilizaremos el siguiente etiquetado para los nodos esclavo .
+
+  Nodo     Etiqueta
+  -------- ----------
+  slave1   agent1
+  slave2   agent2
 
 En nuestra pipeline utilizaremos el nodo agent2 para descargar el codigo
-y el agent1 para las fases de test \`\`\`groovy stage('get code from
-repo') { agent { label 'agent2' } steps { pipelineBanner() sh (''' \[ -e
-"$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A" git
-clone https://\${GIT_TOKEN}@github.com/dargamenteria/actividad1-A ls
--arlt echo \$WORKSPACE ''' ) stash (name: 'workspace')
+y el agent1 para las fases de test
 
-      }
-    }
+``` groovy
+stage('get code from repo') {
+     agent { label 'agent2' }
+     steps {
+       pipelineBanner()
+       sh ('''
+           [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
+           git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
+           ls -arlt 
+           echo $WORKSPACE
+           '''
+          )
+         stash  (name: 'workspace')
 
+     }
+   }
+```
 
-     ```groovy
-    stage('Test phase') {
-          parallel {
-            stage ('Test phase') {
-              agent { label 'agent1' }
-              steps {
-                pipelineBanner()
-                unstash 'workspace'
-                sh ('''
-                    echo "Test phase" 
-                    cd "$WORKSPACE/actividad1-A"
-                    export PYTHONPATH=.
-                    pytest-3 --junitxml=result-test.xml $(pwd)/test/unit
-                ''')
-              }
-            }
+``` groovy
+stage('Test phase') {
+     parallel {
+       stage ('Test phase') {
+         agent { label 'agent1' }
+         steps {
+           pipelineBanner()
+           unstash 'workspace'
+           sh ('''
+               echo "Test phase" 
+               cd "$WORKSPACE/actividad1-A"
+               export PYTHONPATH=.
+               pytest-3 --junitxml=result-test.xml $(pwd)/test/unit
+           ''')
+         }
+       }
 
-            stage ('Test Rest phase') {
-              agent { label 'agent1' }
-              steps {
-                pipelineBanner()
-                unstash 'workspace'
-                sh ('''
-                    echo "Test phase" 
-                    cd "$WORKSPACE/actividad1-A"
-                    export PYTHONPATH=.
-                    export FLASK_APP=$(pwd)/app/api.py
-                    flask run &
-                    java -jar /apps/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
-                    sleep 10
-                    pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
+       stage ('Test Rest phase') {
+         agent { label 'agent1' }
+         steps {
+           pipelineBanner()
+           unstash 'workspace'
+           sh ('''
+               echo "Test phase" 
+               cd "$WORKSPACE/actividad1-A"
+               export PYTHONPATH=.
+               export FLASK_APP=$(pwd)/app/api.py
+               flask run &
+               java -jar /apps/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
+               sleep 10
+               pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
 
-                    ''')
-              }
-            }
-          }
-        }
+               ''')
+         }
+       }
+     }
+   }
+```
 
 En el siguiente log se muestra la ejecución de la pipeline. Nótese el
 uso de la función `pipelineBanner()` definida en nuestra librería
