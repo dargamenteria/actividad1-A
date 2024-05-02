@@ -2,10 +2,10 @@
 
 
 pipeline {
-  agent any
-    environment {
-      GIT_TOKEN=credentials ('dargamenteria_github_token')
-    }
+  agent { label 'agent2' }
+  environment {
+    GIT_TOKEN=credentials ('dargamenteria_github_token')
+  }
   stages {
     stage('Pipeline Info') {
       steps {
@@ -13,17 +13,17 @@ pipeline {
           pipelineBanner()
       }
     }
-    stage('get code from repo') {
+    stage('Build phase') {
       agent { label 'agent2' }
       steps {
         pipelineBanner()
-        sh ('''
-            [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
-            git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
-            ls -arlt 
-            echo $WORKSPACE
-            '''
-           )
+          sh ('''
+              [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
+              git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
+              ls -arlt 
+              echo $WORKSPACE
+              '''
+             )
           stash  (name: 'workspace')
 
       }
@@ -34,13 +34,13 @@ pipeline {
           agent { label 'agent1' }
           steps {
             pipelineBanner()
-            unstash 'workspace'
-            sh ('''
-                echo "Test phase" 
-                cd "$WORKSPACE/actividad1-A"
-                export PYTHONPATH=.
-                pytest-3 --junitxml=result-test.xml $(pwd)/test/unit
-            ''')
+              unstash 'workspace'
+              sh ('''
+                  echo "Test phase" 
+                  cd "$WORKSPACE/actividad1-A"
+                  export PYTHONPATH=.
+                  pytest-3 --junitxml=result-test.xml $(pwd)/test/unit
+                  ''')
           }
         }
 
@@ -48,18 +48,18 @@ pipeline {
           agent { label 'agent1' }
           steps {
             pipelineBanner()
-            unstash 'workspace'
-            sh ('''
-                echo "Test phase" 
-                cd "$WORKSPACE/actividad1-A"
-                export PYTHONPATH=.
-                export FLASK_APP=$(pwd)/app/api.py
-                flask run &
-                java -jar /apps/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
-                sleep 10
-                pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
+              unstash 'workspace'
+              sh ('''
+                  echo "Test phase" 
+                  cd "$WORKSPACE/actividad1-A"
+                  export PYTHONPATH=.
+                  export FLASK_APP=$(pwd)/app/api.py
+                  flask run &
+                  java -jar /apps/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
+                  sleep 10
+                  pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
 
-                ''')
+                  ''')
           }
         }
       }
@@ -69,18 +69,23 @@ pipeline {
       agent { label 'agent1' }
       steps {
         pipelineBanner()
-        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-          unstash 'workspace'
-          sh ('''
-              echo $(pwd)
-              sleep 10
-              ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
-              junit '**/result*.xml' 
+          catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+            unstash 'workspace'
+              sh ('''
+                  echo $(pwd)
+                  sleep 10
+                  ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
+                  junit '**/result*.xml' 
 
-       		    junit '$(pwd)/actividad1-A/result-*.xml'  
-              ''')
-        }
+       		        junit '$(pwd)/actividad1-A/result-*.xml'  
+                  ''')
+          }
       }
+    }
+  }
+  post {
+    always {
+      cleanWs()
     }
   }
 }
