@@ -1,8 +1,12 @@
 -   [Reto 2](#reto-2)
     -   [Distribución de
         agentes](#distribución-de-agentes)
+    -   [¿Porqué separar los en varios
+        agentes?](#porqué-separar-los-en-varios-agentes)
     -   [Pruebas de conexión a los agentes y
         stash/unstash](#pruebas-de-conexión-a-los-agentes-y-stashunstash)
+    -   [Limpieza de
+        workspace](#limpieza-de-workspace)
 
 # Reto 2
 
@@ -16,19 +20,28 @@ Para este apartado utilizaremos la infraestructura definida en el Reto 1
     -   slave2: 192.168.150.229
 
 En la siguiente imagen se muestran los nodos activos\
-![bdc8c910adacea6bb389f19b45cd24bc.png](_resources/bdc8c910adacea6bb389f19b45cd24bc-1.png)
+![bdc8c910adacea6bb389f19b45cd24bc.png](_resources/bdc8c910adacea6bb389f19b45cd24bc.png)
 
 Habilitamos la comunicación de los agentes\
-![1729f9bc463ce4f580148082f66d2cde.png](_resources/1729f9bc463ce4f580148082f66d2cde-1.png)
+![1729f9bc463ce4f580148082f66d2cde.png](_resources/1729f9bc463ce4f580148082f66d2cde.png)
 
-![c00895e1302d0539a0be69a641f2c42a.png](_resources/c00895e1302d0539a0be69a641f2c42a-1.png)
+![c00895e1302d0539a0be69a641f2c42a.png](_resources/c00895e1302d0539a0be69a641f2c42a.png)
 
-![ae75731e5df5925d4ad25a81a69ed60f.png](_resources/ae75731e5df5925d4ad25a81a69ed60f-1.png)
+![ae75731e5df5925d4ad25a81a69ed60f.png](_resources/ae75731e5df5925d4ad25a81a69ed60f.png)
 
 En este punto tenemos 2 agentes conectados a Jenkins
 
 Probamos la conexión via SSH con el mismo resultado\
-![a9f452c9e5e833687ad02fd79fa06e58.png](_resources/a9f452c9e5e833687ad02fd79fa06e58-1.png)
+![a9f452c9e5e833687ad02fd79fa06e58.png](_resources/a9f452c9e5e833687ad02fd79fa06e58.png)
+
+## ¿Porqué separar los en varios agentes?
+
+La separación de la ejecución en varios agentes es interesante ya que:
+\* Permite realizar escalado tanto estático como dinámico de la carga.
+\* Libera al nodo central de las tareas de ejecución. \* Permite la
+ejecución en función de deterinadas características, por ejemplo la
+necesidas de usar una determinada arquitectura, o sistema operativo. \*
+Permite emular arquitecturas distribuidas.
 
 ## Pruebas de conexión a los agentes y stash/unstash
 
@@ -42,7 +55,8 @@ utilizaremos el siguiente etiquetado para los nodos esclavo .
   slave2   agent2
 
 En nuestra pipeline utilizaremos el nodo agent2 para descargar el codigo
-y el agent1 para las fases de test
+y el agent1 para las fases de test ya que hemos configurado este último
+con más capacidad de ejecución.
 
 ``` groovy
 stage('get code from repo') {
@@ -463,3 +477,25 @@ donde se ejecuta la fase y el uso de la funcionalidad stash / unstash.
     [Pipeline] // node
     [Pipeline] End of Pipeline
     Finished: SUCCESS
+
+## Limpieza de workspace
+
+Hemos encontrado un plugin que en teoría puede servirnos para realizar
+la limpieza del workspace\
+[Workspace Clean](https://plugins.jenkins.io/ws-cleanup/) y [Dsitributed
+Workspace Clean up](https://plugins.jenkins.io/hudson-wsclean-plugin/) .
+Cierto es que ninguno no está actualmente mantenido.
+
+La configuración del DWC se realiza desde la configuración general de
+Jenkins\
+![fe47c2a93bb7b4d8318264cc0bd8ffaa.png](_resources/fe47c2a93bb7b4d8318264cc0bd8ffaa.png)
+
+La ejecución del plugin WC se realiza dentro un bloque post global
+
+![e19c88a2cf128b9446cb7f6d2bfa66fc.png](_resources/e19c88a2cf128b9446cb7f6d2bfa66fc.png)
+
+![10abe671fd0a5347cfceefe883a412a3.png](_resources/10abe671fd0a5347cfceefe883a412a3.png)
+
+Adicionalmente, también se puede ajustar el histórico de construcciones
+
+![6abc2e8aaf8da95a1c57b928f899fa56.png](_resources/6abc2e8aaf8da95a1c57b928f899fa56.png)
