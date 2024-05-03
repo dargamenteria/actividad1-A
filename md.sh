@@ -16,3 +16,5 @@ pandoc -s --toc --toc-depth=5 "${1}" -o out.md
 mv out.md "${1}"
 #get rid of #{balalalla} stuff on header
 sed -i 's/{#.*}//g' "${1}"
+
+mkdir docs

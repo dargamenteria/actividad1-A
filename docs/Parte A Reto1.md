@@ -879,7 +879,15 @@ no se levanten correctamente.
 
 Hay dos soluciones, un bucle de espera activo que verifique la conexión
 a los puertos 9090 y 5000 o una espera arbitrariamente grande por
-ejemplo 10 segundos
+ejemplo 10 segundos.
+
+-   Espera activa
+
+``` bash
+while [ "$(ss -lnt | grep -E "9090|5000" | wc -l)" != "2" ] ; do echo "No perative yet" ; sleep 10; done
+```
+
+-   Añadiendo un sleep
 
 ``` groovy
 stage ('Test Rest phase') {
@@ -897,6 +905,9 @@ stage ('Test Rest phase') {
            }
        }
 ```
+
+En las pipelines hemos implementado simplemente un sleep para mayor
+comodidad
 
 #### Convertir ambas etapas para se ejecuten en paralelo
 
