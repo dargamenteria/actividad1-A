@@ -1,4 +1,5 @@
 import http.client
+from http import HTTPStatus
 
 from flask import Flask
 
@@ -18,8 +19,33 @@ def hello():
 @api_application.route("/calc/add/<op_1>/<op_2>", methods=["GET"])
 def add(op_1, op_2):
     try:
-        num_1, num_2 = util.convert_to_number(op_1), util.convert_to_number(op_2)
+        num_1, num_2 = util.convert_to_number(
+            op_1), util.convert_to_number(op_2)
         return ("{}".format(CALCULATOR.add(num_1, num_2)), http.client.OK, HEADERS)
+    except TypeError as e:
+        return (str(e), http.client.BAD_REQUEST, HEADERS)
+
+
+@api_application.route("/calc/divide/<op_1>/<op_2>", methods=["GET"])
+def divide(op_1, op_2):
+    try:
+        num_1, num_2 = util.convert_to_number(
+            op_1), util.convert_to_number(op_2)
+        if num_2 == 0:
+            return (str("Division by 0"), http.client.NOT_ACCEPTABLE, HEADERS)
+
+        return ("{}".format(CALCULATOR.divide(num_1, num_2)), http.client.OK, HEADERS)
+    except TypeError as e:
+        return (str(e), http.client.BAD_REQUEST, HEADERS)
+        # return (str(e), http.client.NOT_ACCEPTABLE, HEADERS)
+
+
+@api_application.route("/calc/multiply/<op_1>/<op_2>", methods=["GET"])
+def multiply(op_1, op_2):
+    try:
+        num_1, num_2 = util.convert_to_number(
+            op_1), util.convert_to_number(op_2)
+        return ("{}".format(CALCULATOR.multiply(num_1, num_2)), http.client.OK, HEADERS)
     except TypeError as e:
         return (str(e), http.client.BAD_REQUEST, HEADERS)
 
@@ -27,7 +53,8 @@ def add(op_1, op_2):
 @api_application.route("/calc/substract/<op_1>/<op_2>", methods=["GET"])
 def substract(op_1, op_2):
     try:
-        num_1, num_2 = util.convert_to_number(op_1), util.convert_to_number(op_2)
+        num_1, num_2 = util.convert_to_number(
+            op_1), util.convert_to_number(op_2)
         return ("{}".format(CALCULATOR.substract(num_1, num_2)), http.client.OK, HEADERS)
     except TypeError as e:
         return (str(e), http.client.BAD_REQUEST, HEADERS)
