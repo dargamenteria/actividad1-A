@@ -28,7 +28,7 @@ pipeline {
 
       }
     }
-    stage('Test phase') {
+    stage('Test phase: Unit test') {
       parallel {
         stage ('Test phase') {
           agent { label 'agent1' }
@@ -44,49 +44,54 @@ pipeline {
           }
         }
 
-        stage ('Test Rest phase') {
+        stage ('Test phase: Integration test') {
           agent { label 'agent1' }
           steps {
             pipelineBanner()
               unstash 'workspace'
-              sh ('''
-                  echo "Test phase" 
-                  cd "$WORKSPACE/actividad1-A"
-                  export PYTHONPATH=.
-                  export FLASK_APP=$(pwd)/app/api.py
-                  flask run &
-                  java -jar /apps/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
-                  sleep 10
-                  pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
+              lock ('test-resources'){
+                sh ('''
+                    echo "Test phase" 
+                    cd "$WORKSPACE/actividad1-A"
 
-                  ''')
+                    export PYTHONPATH=.
+                    export FLASK_APP=$(pwd)/app/api.py
+
+                    flask run &
+                    java -jar /apps/wiremock/wiremock-standalone-3.5.4.jar --port 9090 --root-dir $(pwd)/test/wiremock &
+
+                    while [ "$(ss -lnt | grep -E "9090|5000" | wc -l)" != "2" ] ; do echo "No perative yet" ; sleep 1; done
+
+                    pytest-3 --junitxml=result-rest.xml $(pwd)/test/rest
+                    ''')
+              }
           }
         }
+      }   
+
+      stage ('Result Test'){
+        agent { label 'agent1' }
+        steps {
+          pipelineBanner()
+            catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+              unstash 'workspace'
+                sh ('''
+                    echo $(pwd)
+                    sleep 10
+                    ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
+                    junit '**/result*.xml' 
+
+                    ''')
+                junit allowEmptyResults: true, testResults: '$(pwd)/actividad1-A/result-*.xml'  
+
+            }
+        }
       }
-    }   
-
-    stage ('Result Test'){
-      agent { label 'agent1' }
-      steps {
-        pipelineBanner()
-          catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-            unstash 'workspace'
-              sh ('''
-                  echo $(pwd)
-                  sleep 10
-                  ls -arlt  "$(pwd)/actividad1-A/result-*.xml"
-                  junit '**/result*.xml' 
-
-       		        junit '$(pwd)/actividad1-A/result-*.xml'  
-                  ''')
-          }
+    }
+    post {
+      always {
+        cleanWs()
       }
     }
   }
-  post {
-    always {
-      cleanWs()
-    }
-  }
-}
 

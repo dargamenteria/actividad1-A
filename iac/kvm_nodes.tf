@@ -80,7 +80,7 @@ resource "null_resource" "provisioner" {
       "sudo apt update -y",
       "sudo apt install -y cloud-guest-utils",
       "sudo growpart /dev/vda 1",
-      "sudo apt install -y ca-certificates curl python3-flask",
+      "sudo apt install -y ca-certificates curl python3-flask junit",
       "sudo mkdir -p /apps/wiremock",
       "sudo curl --create-dirs -O --output-dir /apps/wiremock https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.5.4/wiremock-standalone-3.5.4.jar",
       "sudo chmod -R 755 /apps/wiremock",
