@@ -19,11 +19,11 @@ pipeline {
         pipelineBanner()
           sh ('''
               [ -e "$WORKSPACE/actividad1-A" ] && rm -fr "$WORKSPACE/actividad1-A"
+              git clone https://${GIT_TOKEN}@github.com/dargamenteria/actividad1-A
               ls -arlt 
               echo $WORKSPACE
               '''
              )
-          git branch: 'develop', url: 'https://github.com/dargamenteria/actividad1-A'
           stash  (name: 'workspace')
 
       }
