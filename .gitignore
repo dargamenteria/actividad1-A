@@ -1,4 +1,5 @@
 result.xml
 iac/.terraform
+.lock*
 __pycache__
 .pytest_cache
