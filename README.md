@@ -1,12 +1,3 @@
----
-title: README
-updated: 2024-05-03 21:14:01Z
-created: 2024-05-03 21:04:25Z
-latitude: 41.38506390
-longitude: 2.17340350
-altitude: 0.0000
----
-
 # Repo para EU - DevOps&Cloud - UNIR
 
 En este repo se incluye la solución al caso practico1 apartado A
